@@ -26,9 +26,9 @@ public class IniciaSesion {
 		Thread.sleep(1250);
 		if(dr.searchElement(0, "js-username-field") != 0) {
 			//Insertar el usuario
-			dr.inputWrite(0, "js-username-field", "carmanandres_",110);
+			dr.inputWrite(0, "js-username-field", username,110);
 			//Insertar el password
-			dr.inputWrite(0, "js-password-field", "Twitterl4ms" ,110);
+			dr.inputWrite(0, "js-password-field",  password ,110);
 			//Presionar el boton de sesion
 			if(dr.searchElement(1, "/html/body/div[1]/div[3]/div/div/div[1]/form/div[2]/button") != 0) {
 				dr.clickButton(1, "/html/body/div[1]/div[3]/div/div/div[1]/form/div[2]/button", "Iniciar Sesion xPath");
@@ -48,9 +48,9 @@ public class IniciaSesion {
 			dr.clickButton(1,"/html/body/div/div/div/div[1]/main/div/div/form/div/div[3]/div/div","Iniciar Sesion XPath");
 
 		}else if(dr.searchElement(1, "/html/body/div/div/div/div[2]/main/div/div/form/div/div[1]/label/div[2]/div/input") != 0) {
-			dr.inputWrite(1,"html/body/div/div/div/div[2]/main/div/div/form/div/div[1]/label/div[2]/div/input","carmanandres_",110);
+			dr.inputWrite(1,"html/body/div/div/div/div[2]/main/div/div/form/div/div[1]/label/div[2]/div/input",username,110);
 			
-			dr.inputWrite(1, "/html/body/div/div/div/div[2]/main/div/div/form/div/div[2]/label/div[2]/div/input", "Twitterl4ms", 110);
+			dr.inputWrite(1, "/html/body/div/div/div/div[2]/main/div/div/form/div/div[2]/label/div[2]/div/input", password, 110);
 			
 			dr.clickButton(1, "/html/body/div/div/div/div[2]/main/div/div/form/div/div[3]/div", "Click Button xPath");
 		}
