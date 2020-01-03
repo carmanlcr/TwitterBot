@@ -98,12 +98,12 @@ public class InicioController {
 			if(idlistTask == 0) {
 				System.out.println("El usuario no tiene mas tareas por publicar");
 			}else {
-//				String ip = validateIP();
-//				vp = new VpnController(robot);
-//				vp.iniciarVpn(user[4],banderaVpn);
-//				String ipActual = validateIP();
+				String ip = validateIP();
+				vp = new VpnController(robot);
+				vp.iniciarVpn(user[4],banderaVpn);
+				String ipActual = validateIP();
 				//Valida si la vpn conecto
-				if("s".equals("ss")) {
+				if(ip.equals(ipActual)) {
 					System.err.println("El usuario "+user[1]+ " no se puedo conectar a la vpn");
 					usuariosAProcesar++;
 				}else {
@@ -222,7 +222,7 @@ public class InicioController {
 					break;
 				case 5:
 					// Publicacion final
-					if(categoria_id != 3) {
+					if(categoria_id != 1) {
 						System.out.println("HACER PUBLICACION FINAL");
 						String pieFoto = pieDeFoto.get(ini).getText();
 						String user = listUsers.get(ini).getText();
