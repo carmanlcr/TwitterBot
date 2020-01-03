@@ -59,6 +59,10 @@ public class VpnController {
 			Thread.sleep(256);
 			robot.pulsarTabulador();
 			Thread.sleep(256);
+			robot.pulsarTabulador();
+			Thread.sleep(256);
+			robot.pulsarTabulador();
+			Thread.sleep(256);
 		}
 		//copiar la vpn en el portapapeles
 		robot.copy(vpn);
