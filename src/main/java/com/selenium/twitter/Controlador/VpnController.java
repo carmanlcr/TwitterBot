@@ -46,7 +46,17 @@ public class VpnController {
 			Thread.sleep(256);
 			robot.pulsarTabulador();
 			Thread.sleep(256);
+			robot.pulsarTabulador();
+			Thread.sleep(256);
+			robot.pulsarTabulador();
+			Thread.sleep(256);
 		}else {
+			robot.pulsarTabulador();
+			Thread.sleep(256);
+			robot.pulsarTabulador();
+			Thread.sleep(256);
+			robot.pulsarTabulador();
+			Thread.sleep(256);
 			robot.pulsarTabulador();
 			Thread.sleep(256);
 			robot.pulsarTabulador();
