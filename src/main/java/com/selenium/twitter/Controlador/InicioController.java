@@ -120,15 +120,16 @@ public class InicioController {
 					//Esperar que cargue la pagina para que cargue el dom completamente
 					Thread.sleep(5500); 
 					System.out.println("*********************"+user[1]+"***********************");
-					//Si el usuario esta bloqueado manda mensaje de error
 					if(!validateUserBlock()) {
 						startAfterInitSesion(idlistTask);
 						System.out.println("Se cerro la sesión del usuario "+user[1]);
-						if(drive != null) drive.quit();
+						
 					}//fin del else
-					
+					//quit drive
+					if(drive != null) drive.quit();
 					//Desconectar la vpn para el siguiente usuario
 					if(vp != null) vp.desconectVpn();
+					
 					banderaVpn = true;
 					Thread.sleep(2000);
 				}//Fin del if si se conecto a la ip
