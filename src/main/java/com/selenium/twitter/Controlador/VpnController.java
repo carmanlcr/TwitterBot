@@ -13,9 +13,10 @@ public class VpnController {
 	
 	void iniciarVpn(String vpn, boolean bandera) throws InterruptedException {
 		openVPN();
-		Thread.sleep(2000);
+		Thread.sleep(3000);
 		//Maximizar ventana
 		robot.maximizar();
+		Thread.sleep(1500);
 		//Seleccionar el buscador de la vpn
 		if(bandera) {
 			robot.pulsarTabulador();
