@@ -161,7 +161,7 @@ public class User implements Model{
 		ResultSet rs = null;
 		String query = "SELECT * FROM "+TABLE_NAME+" us" 
 				+ " WHERE NOT us.users_id = ? "
-				+ " GROUP BY RAND() LIMIT 1;";
+				+ " ORDER BY RAND() LIMIT 1;";
 		
 		try (Connection conexion = conn.conectar();
 				PreparedStatement exe = conexion.prepareStatement(query)){
