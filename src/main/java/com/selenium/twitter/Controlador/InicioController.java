@@ -34,7 +34,6 @@ public class InicioController {
 	private static final String URL_TWITTER = "https://twitter.com/";
 	private static DriverController drive;
 	private Post po = new Post();
-	private static String[] user;
 	private static User users;
 	private VpnController vp;
 	private RobotController robot;
@@ -46,6 +45,7 @@ public class InicioController {
 	private boolean banderaVpn = false;
 	private int count  = 0;
 	private int ini = 0;
+	private int users_id;
 	private int categoria_id;
 	private int idGenere;
 	private int usuariosAProcesar;
@@ -81,11 +81,11 @@ public class InicioController {
 		for (JCheckBox jCheckBox : usuarios) {
 			usuariosAProcesar++;
 			users = new User();
-			users.setEmail(jCheckBox.getText());
 			users.setUsername(jCheckBox.getText());
-			users.setCategories_id(categoria_id);
-			user = users.getUser();
-			po.setUsers_id(Integer.parseInt(user[0]));
+			users.setEmail(jCheckBox.getText());
+			users = users.getUser();
+			users_id = users.getUsers_id();
+			po.setUsers_id(users_id);
 			drive = null;
 			String generes = (String) comboBoxGenere.get(ini).getSelectedItem();
 			Genere gene = new Genere();
@@ -100,11 +100,14 @@ public class InicioController {
 			}else {
 				String ip = validateIP();
 				vp = new VpnController(robot);
-				vp.iniciarVpn(user[4],banderaVpn);
+				Vpn v = new Vpn();
+				v.setVpn_id(users.getVpn_id());
+				v = v.getVpn();
+				vp.iniciarVpn(v.getName(), banderaVpn);
 				String ipActual = validateIP();
 				//Valida si la vpn conecto
 				if(ip.equals(ipActual)) {
-					System.err.println("El usuario "+user[1]+ " no se puedo conectar a la vpn");
+					System.err.println("El usuario "+users.getUsername()+ " no se puedo conectar a la vpn");
 					usuariosAProcesar++;
 				}else {
 					//Setear valores a google Chrome
@@ -115,14 +118,14 @@ public class InicioController {
 					
 					Thread.sleep(2000);
 					
-					IniciaSesion sesion = new IniciaSesion(drive,user[1],user[3]);
+					IniciaSesion sesion = new IniciaSesion(drive,users.getUsername(),users.getPassword());
 					sesion.init();
 					//Esperar que cargue la pagina para que cargue el dom completamente
 					Thread.sleep(5500); 
-					System.out.println("*********************"+user[1]+"***********************");
+					System.out.println("*********************"+users.getUsername()+"***********************");
 					if(!validateUserBlock()) {
 						startAfterInitSesion(idlistTask);
-						System.out.println("Se cerro la sesión del usuario "+user[1]);
+						System.out.println("Se cerro la sesión del usuario "+users.getUsername());
 						
 					}//fin del else
 					//quit drive
@@ -144,7 +147,7 @@ public class InicioController {
 		if(drive.searchElement(1,"//*[text()[contains(.,'Verifica tu identidad')]]") != 0 
 				&& drive.searchElement(1, "//*[text()[contains(.,'Tu número de teléfono termina')]]") != 0) {
 			userBlocked("Pide verificación de identidad por numero de telefono");
-			System.out.println("El usuario "+user[1]+" esta bloqueado");
+			System.out.println("El usuario "+users.getUsername()+" esta bloqueado");
 			return true;
 		}else if(drive.searchElement(1, "/html/body/div[2]/div/div/span") != 0
 				|| drive.searchElement(1, "//*[text()[contains(.,'El nombre de usuario y la contraseña que ingresaste no coinciden con nuestros registros.')]]") != 0) {
@@ -153,7 +156,7 @@ public class InicioController {
 		}else if(drive.searchElement(1, "/html/body/div[2]/div/div[1]") != 0
 				|| drive.searchElement(1, "/html/body/div[2]/div/form/input[6]") != 0) {
 			userBlocked("We've temporarily limited some of your account features");
-			System.out.println("El usuario "+user[1]+" esta bloqueado");
+			System.out.println("El usuario "+users.getUsername()+" esta bloqueado");
 			return true;
 		}
 		
@@ -189,7 +192,7 @@ public class InicioController {
 		}
 		
 
-		System.out.println("Se cerro la sesión del usuario " + user[1]);
+		System.out.println("Se cerro la sesión del usuario " + users.getUsername());
 	}
 	
 	private void random(List<Integer> listTask, int idListTask) throws InterruptedException, SQLException {
@@ -277,7 +280,7 @@ public class InicioController {
 		Thread.sleep(getNumberRandomForSecond(2145 ,2458));
 		
 		User us = new User();
-		us.setUsers_id(Integer.parseInt(user[0]));
+		us.setUsers_id(users_id);
 		String usuario = "";
 		try {
 			us = us.getDifferentRandomUser();
@@ -556,7 +559,7 @@ public class InicioController {
 	
 	private void userBlocked(String motive) {
 		User_Block userB = new User_Block();
-		userB.setUsers_id(Integer.parseInt(user[0]));
+		userB.setUsers_id(users_id);
 		userB.setComentario(motive);
 		if(userB.getIdUser() == 0) {
 			userB.insert();
