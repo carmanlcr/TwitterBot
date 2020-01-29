@@ -263,6 +263,9 @@ public class InicioController {
 						}
 					}
 					break;
+				case 6:
+					publicTweet();
+					break;
 				default:
 					break;
 			}
@@ -358,6 +361,28 @@ public class InicioController {
 		}
 	}
 	
+	private void publicTweet() throws InterruptedException {
+		if(drive.searchElement(1, "//*[@data-testid='SideNav_NewTweet_Button']") != 0) {
+			drive.clickButton(1, "//*[@data-testid='SideNav_NewTweet_Button']", "Tweet");
+		}else if(drive.searchElement(1, "/html/body/div/div/div/div/header/div/div/div/div/div[3]/a") != 0) {
+			drive.clickButton(1, "/html/body/div/div/div/div/header/div/div/div/div/div[3]/a", "Tweet xPath");
+		}
+		
+		String array[] = {"Que bonito día!","Los politicos no sirven -.-","No me lo creo","Que genial idea jajaja","Siganme #followback"
+				,"¿Quien me quiere y para que?","Alguién por aquí?","Que agradable sujeto","Esa noticia me dejo en shock","Jajajajajajajajajajajaj"
+				,"Todos vamos al mismo camino.","Es irrelevante eso que me dices","Si no te agrado te vas","Sigueme y te sigo #followback #follow"
+				,"Tusa","Really?","Cantaclaro","Simon Diaz","No es copia, jamas.","Soy de las personas que prefieren netflix que estar en una rumba"
+				,"¿Tu mamá sabe que usas el internet para dejarme en visto?","Amo la lluvia","Odio los climas calientes","Perro catolico"
+				,"El celular nunca puede ser mas importante que la persona con la que estas comiendo.","No!","O quizás si jejeje","Que cancion tan genial"};
+		
+		robot.inputWrite(array[getNumberRandomForSecond(0, array.length-1)]);
+		Thread.sleep(getNumberRandomForSecond(1254, 1798));
+		
+		drive.clickButton(1, "//*[@data-testid='tweetButton']", "TweetButton publicar");
+		Thread.sleep(getNumberRandomForSecond(8546, 8677));
+		robot.pressEsc();
+		robot.pressEsc();
+	}
 	/**
 	 * Publicar imagen normal 
 	 * 
@@ -399,6 +424,8 @@ public class InicioController {
 			
 			drive.clickButton(1, "//*[@data-testid='tweetButton']", "TweetButton publicar");
 			Thread.sleep(getNumberRandomForSecond(8546, 8677));
+			robot.pressEsc();
+			robot.pressEsc();
 		}else {
 			System.out.println("No hay sub categorias para publicar");
 			robot.pressEsc();
