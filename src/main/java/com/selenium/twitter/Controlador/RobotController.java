@@ -19,7 +19,7 @@ public class RobotController {
 	 * @author Luis Morales
 	 * @version 1.0.0
 	 */
-	public RobotController() {
+	protected RobotController() {
 		try {
 			robot = new Robot();
 		}catch (Exception e) {
@@ -34,7 +34,7 @@ public class RobotController {
 	 * @version 1.0.0
 	 * @param vpn Nombre de la vpn
 	 */
-	public RobotController(String vpn) {
+	protected RobotController(String vpn) {
 		this.vpn = vpn;
 		try {
 			robot = new Robot();
@@ -51,7 +51,7 @@ public class RobotController {
 	 * @param x posición en equis(x) del mouse
 	 * @param y posición en y del mouse
 	 */
-	public void dimensions(int x, int y) {
+	protected void dimensions(int x, int y) {
 		robot.mouseMove(x, y);
 	}
 	
@@ -61,7 +61,7 @@ public class RobotController {
 	 * @author Luis Morales
 	 * @version 1.0.0
 	 */
-	public void clickPressed() {
+	protected void clickPressed() {
 		robot.mousePress(mask);
 		robot.mouseRelease(mask);
 	}
@@ -72,19 +72,19 @@ public class RobotController {
 	 * @author Luis Morales
 	 * @version 1.0.0
 	 */
-	public void copy() {
+	protected void copy() {
 		 StringSelection stringSelection = new StringSelection(this.vpn);
 		 clipboard.setContents(stringSelection, null);
 	}
 	
 	/**
-	 * Se copia en el portapapeles la direccion de la imagen a publicar
+	 * Se copia en el portapapeles la direccion de la imagen a protectedar
 	 * 
 	 * @author Luis Morales
 	 * @version 1.0.0
-	 * @param imagePath path de la imagen a publicar
+	 * @param imagePath path de la imagen a protectedar
 	 */
-	public void copy(String imagePath) {
+	protected void copy(String imagePath) {
 		 StringSelection stringSelection = new StringSelection(imagePath);
 		 try {
 			 clipboard.setContents(stringSelection, null);
@@ -104,7 +104,7 @@ public class RobotController {
 	 * @author Luis Morales
 	 * @version 1.0.0
 	 */
-	public void paste() {
+	protected void paste() {
 		robot.keyPress(KeyEvent.VK_CONTROL);
 		robot.keyPress(KeyEvent.VK_V);
 		robot.keyRelease(KeyEvent.VK_CONTROL);
@@ -117,9 +117,23 @@ public class RobotController {
 	 * @author Luis Morales
 	 * @version 1.0.0
 	 */
-	public void enter() {
+	protected void enter() {
 		robot.keyPress(KeyEvent.VK_ENTER);
 		robot.keyRelease(KeyEvent.VK_ENTER);
+	}
+	
+	
+	/**
+	 * 
+	 * Presionar teclar TAB
+	 * 
+	 * @author Luis Morales
+	 * @version 1.0.0
+	 * 
+	 */
+	protected void pressTab() {
+		robot.keyPress(KeyEvent.VK_TAB);
+		robot.keyRelease(KeyEvent.VK_TAB);
 	}
 	
 	/**
@@ -128,7 +142,7 @@ public class RobotController {
 	 * @author Luis Morales
 	 * @version 1.0.0
 	 */
-	public void close() {
+	protected void close() {
 		robot.keyPress(KeyEvent.VK_ALT);
 		robot.keyPress(KeyEvent.VK_F4);
 		robot.keyRelease(KeyEvent.VK_ALT);
@@ -141,7 +155,7 @@ public class RobotController {
 	 * @author Luis Morales
 	 * @version 1.0.0
 	 */
-	public void maximizar() {
+	protected void maximizar() {
 		robot.keyPress(KeyEvent.VK_WINDOWS);
 		robot.keyPress(KeyEvent.VK_UP);
 		robot.keyRelease(KeyEvent.VK_WINDOWS);
@@ -157,7 +171,7 @@ public class RobotController {
 	 * @param value
 	 * @throws InterruptedException 
 	 */
-	public void mouseScroll(int value) throws InterruptedException{
+	protected void mouseScroll(int value) throws InterruptedException{
 		if(value < 0) {
 			for(int i = 0; i<(value*-1); i++) {
 				Thread.sleep(120);
@@ -178,7 +192,7 @@ public class RobotController {
 	 * @author Luis Morales
 	 * @version 1.0.0
 	 */
-	public void maxiIzquierda() {
+	protected void maxiIzquierda() {
 		robot.keyPress(KeyEvent.VK_WINDOWS);
 		robot.keyPress(KeyEvent.VK_CAPS_LOCK);
 		robot.keyPress(KeyEvent.VK_LEFT);
@@ -193,7 +207,7 @@ public class RobotController {
 	 *  @author Luis Morales
 	 *  
 	 */
-	public void pulsarTabulador() {
+	protected void pulsarTabulador() {
 		robot.keyPress(KeyEvent.VK_TAB);
 		robot.keyRelease(KeyEvent.VK_TAB);
 	}
@@ -204,7 +218,7 @@ public class RobotController {
 	 *  @author Luis Morales
 	 *  
 	 */
-	public void pulsarShiftTabulador() {
+	protected void pulsarShiftTabulador() {
 		robot.keyPress(KeyEvent.VK_SHIFT);
 		robot.keyPress(KeyEvent.VK_TAB);
 		robot.keyRelease(KeyEvent.VK_SHIFT);
@@ -214,7 +228,7 @@ public class RobotController {
 	/**
 	 * Seleccionar todo Ctrl + A y Eliminar Delete
 	 */
-	public void selectAllAndDelete() {
+	protected void selectAllAndDelete() {
 		robot.keyPress(KeyEvent.VK_CONTROL);
 		robot.keyPress(KeyEvent.VK_A);
 		robot.keyRelease(KeyEvent.VK_CONTROL);
@@ -227,7 +241,7 @@ public class RobotController {
 	 * Darle click al boton de Escape
 	 * 
 	 */
-	public void pressEsc() {
+	protected void pressEsc() {
 		robot.keyPress(KeyEvent.VK_ESCAPE);
 		robot.keyRelease(KeyEvent.VK_ESCAPE);
 	}
@@ -237,7 +251,7 @@ public class RobotController {
 	 * 
 	 * @param key
 	 */
-	public void pressKey(char key) {
+	protected void pressKey(char key) {
 		switch(key){
 			
         case '☺': altNumpad("1"); break;
