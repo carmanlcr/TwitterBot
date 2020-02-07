@@ -15,6 +15,9 @@ import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.NoSuchElementException;
+
 import com.selenium.twitter.Modelo.Genere;
 import com.selenium.twitter.Modelo.Post;
 import com.selenium.twitter.Controlador.RobotController;
@@ -49,6 +52,7 @@ public class InicioController {
 	private int categoria_id;
 	private int idGenere;
 	private int usuariosAProcesar;
+	private boolean userBlock;
 	 
 	
 
@@ -79,6 +83,7 @@ public class InicioController {
 		usuariosAProcesar = 0;
 		
 		for (JCheckBox jCheckBox : usuarios) {
+			userBlock = false;
 			usuariosAProcesar++;
 			users = new User();
 			users.setUsername(jCheckBox.getText());
@@ -203,77 +208,79 @@ public class InicioController {
 			robot.mouseScroll(mouseScrollNumber);
 			Thread.sleep(getNumberRandomForSecond(940, 1130));
 			robot.mouseScroll(mouseScrollNumber * -1);
-			switch (li) {
-				case 1:
-					// Entrar en Editar Perfil
-					System.out.println("ENTRAR EN PERFIL Y DAR LIKE A FOTO");
-					likeProfile();
-					break;
-				case 2:
-					System.out.println("SUBIR IMAGEN NORMAL TIPO COMIDA, MEME, BEBIDA");
-					uploadImage();
-					break;
-				case 3:
-					// Revisar los grupos
-					// Ingresar en la seccion de grupos
-					System.out.println("ENTRAR EN MENSAJES");
-					reviewMessage();
-					break;
-				case 4:
-					// Publicar en Grupo
-					// Ingresar en la seccion de grupos
-					reviewNotifaction();
-					break;
-				case 5:
-					// Publicacion final
-					if(categoria_id != 1) {
-						System.out.println("HACER PUBLICACION FINAL");
-						String pieFoto = pieDeFoto.get(ini).getText();
-						String user = listUsers.get(ini).getText();
-						List<String> hashTag = checkBoxHashTag.get(ini);
-						String hash = uploadImageFinal(pieFoto, user, hashTag);
-						if(!hash.isEmpty()) {
-							String[] ha = hash.split(" ");
-							System.out.println("Registrando post");
-							po.setTasks_model_id(taskModelId);
-							goProfileForUrl();
-							System.out.println("Post insertado");
-							po.insert();
-							Post_Detail poDe = new Post_Detail();
-							poDe.setPosts_id(po.getLast());
-							HashTag ht = new HashTag();
-							ht.setCategories_id(categoria_id);
-							ht.setGeneres_id(idGenere);
-							System.out.println("Registrando HashTag");
-							for (int j = 0; j < ha.length; j++) {
-
-								ht.setName(ha[j]);
-
-								poDe.setHashtag_id(ht.getIdCategorieHashTag());
-
-								poDe.insert();
+			if(!userBlock) {
+				switch (li) {
+					case 1:
+						// Entrar en Editar Perfil
+						likeProfile();
+						break;
+					case 2:
+						uploadImage();
+						break;
+					case 3:
+						// Revisar los grupos
+						// Ingresar en la seccion de grupos
+						reviewMessage();
+						break;
+					case 4:
+						// Publicar en Grupo
+						// Ingresar en la seccion de grupos
+						reviewNotifaction();
+						break;
+					case 5:
+						// Publicacion final
+						if(categoria_id != 1) {
+							System.out.println("HACER PUBLICACION FINAL");
+							String pieFoto = pieDeFoto.get(ini).getText();
+							String user = listUsers.get(ini).getText();
+							List<String> hashTag = checkBoxHashTag.get(ini);
+							String hash = uploadImageFinal(pieFoto, user, hashTag);
+							if(!hash.isEmpty()) {
+								String[] ha = hash.split(" ");
+								System.out.println("Registrando post");
+								po.setTasks_model_id(taskModelId);
+								goProfileForUrl();
+								System.out.println("Post insertado");
+								po.insert();
+								Post_Detail poDe = new Post_Detail();
+								poDe.setPosts_id(po.getLast());
+								HashTag ht = new HashTag();
+								ht.setCategories_id(categoria_id);
+								ht.setGeneres_id(idGenere);
+								System.out.println("Registrando HashTag");
+								for (int j = 0; j < ha.length; j++) {
+	
+									ht.setName(ha[j]);
+	
+									poDe.setHashtag_id(ht.getIdCategorieHashTag());
+	
+									poDe.insert();
+								}
+								System.out.println("El usuario publico correctamente");
+							}else {
+								System.out.println("El usuario no publico");
 							}
-							System.out.println("El usuario publico correctamente");
-						}else {
-							System.out.println("El usuario no publico");
+							ini++;
+							if(ini >= count) {
+								ini = 0;
+							}
 						}
-						ini++;
-						if(ini >= count) {
-							ini = 0;
-						}
-					}
-					break;
-				case 6:
-					publicTweet();
-					break;
-				default:
-					break;
+						break;
+					case 6:
+						publicTweet();
+						break;
+					case 7:
+						followUsers();
+					default:
+						break;
+				}
 			}
 			returnHome();
 		} // Fin del For
 	}
 	
 	private void likeProfile() throws InterruptedException {
+		System.out.println("ENTRAR EN PERFIL Y DAR LIKE A FOTO");
 		if(drive.searchElement(1,"//*[@aria-label='Buscar y explorar']") != 0) {
 			drive.clickButton(1, "//*[@aria-label='Buscar y explorar']", "Buscar aria-label");
 		}else if(drive.searchElement(1, "//*[@data-testid='AppTabBar_Explore_Link']") != 0) {
@@ -362,27 +369,153 @@ public class InicioController {
 	}
 	
 	private void publicTweet() throws InterruptedException {
+		System.out.println("PUBLICAR TWEET NORMAL");
 		if(drive.searchElement(1, "//*[@data-testid='SideNav_NewTweet_Button']") != 0) {
 			drive.clickButton(1, "//*[@data-testid='SideNav_NewTweet_Button']", "Tweet");
 		}else if(drive.searchElement(1, "/html/body/div/div/div/div/header/div/div/div/div/div[3]/a") != 0) {
 			drive.clickButton(1, "/html/body/div/div/div/div/header/div/div/div/div/div[3]/a", "Tweet xPath");
 		}
 		
-		String array[] = {"Que bonito día!","Los politicos no sirven -.-","No me lo creo","Que genial idea jajaja","Siganme #followback"
-				,"¿Quien me quiere y para que?","Alguién por aquí?","Que agradable sujeto","Esa noticia me dejo en shock","Jajajajajajajajajajajaj"
-				,"Todos vamos al mismo camino.","Es irrelevante eso que me dices","Si no te agrado te vas","Sigueme y te sigo #followback #follow"
-				,"Tusa","Really?","Cantaclaro","Simon Diaz","No es copia, jamas.","Soy de las personas que prefieren netflix que estar en una rumba"
-				,"¿Tu mamá sabe que usas el internet para dejarme en visto?","Amo la lluvia","Odio los climas calientes","Perro catolico"
-				,"El celular nunca puede ser mas importante que la persona con la que estas comiendo.","No!","O quizás si jejeje","Que cancion tan genial"};
+		String array[] = {"Que bonito día! #followback","Los politicos no sirven -.-","No me lo creo #followback","Que genial idea jajaja #followback",
+				"Siganme #followback","¿Quien me quiere y para que? #follow","Alguién por aquí? #follow","Que agradable sujeto","Esa noticia me dejo en shock",
+				"Jajajajajajajajajajajaj","Todos vamos al mismo camino.","Es irrelevante eso que me dices","Si no te agrado te vas",
+				"Sigueme y te sigo #followback #follow","Tusa","Really?","Cantaclaro","Simon Diaz","No es copia, jamas.",
+				"Soy de las personas que prefieren netflix que estar en una rumba","¿Tu mamá sabe que usas el internet para dejarme en visto?",
+				"Amo la lluvia","Odio los climas calientes","Perreo catolico","El celular nunca puede ser mas importante que la persona con la que estas comiendo.",
+				"No!","O quizás si jejeje","Que cancion tan genial"};
 		
 		robot.inputWrite(array[getNumberRandomForSecond(0, array.length-1)]);
-		Thread.sleep(getNumberRandomForSecond(1254, 1798));
 		
-		drive.clickButton(1, "//*[@data-testid='tweetButton']", "TweetButton publicar");
+		try {
+			if(drive.searchElement(1, "//*[@data-testid='tweetButton']") != 0) {
+				drive.clickButton(1, "//*[@data-testid='tweetButton']", "TweetButton publicar");
+			}
+			Thread.sleep(getNumberRandomForSecond(1254, 1798));
+		}catch(ElementClickInterceptedException e) {
+			
+			robot.pressTab();
+			Thread.sleep(124);
+			robot.pressTab();
+			Thread.sleep(124);
+			robot.pressTab();
+			Thread.sleep(124);
+			robot.pressTab();
+			Thread.sleep(124);
+			robot.pressTab();
+			Thread.sleep(124);
+			robot.pressTab();
+			Thread.sleep(124);
+			robot.enter();
+			
+			Thread.sleep(1000);
+			if(drive.searchElement(1, "//*[text()[contains(.,'Your account is suspended and is not permitted to send Tweets.')]]") != 0) {
+				userBlock = true;
+				userBlocked("Your account is suspended and is not permitted to send Tweets.");
+			}
+		}catch(NoSuchElementException e1) {
+			robot.pressTab();
+			Thread.sleep(124);
+			robot.pressTab();
+			Thread.sleep(124);
+			robot.pressTab();
+			Thread.sleep(124);
+			robot.pressTab();
+			Thread.sleep(124);
+			robot.pressTab();
+			Thread.sleep(124);
+			robot.pressTab();
+			Thread.sleep(124);
+			robot.enter();
+			
+			Thread.sleep(1000);
+			if(drive.searchElement(1, "//*[text()[contains(.,'Your account is suspended and is not permitted to send Tweets.')]]") != 0) {
+				userBlock = true;
+			}
+		}
+		
+		if(drive.searchElement(1, "//*[text()[contains(.,'Your account is suspended and is not permitted to send Tweets.')]]") != 0) {
+			userBlock = true;
+		}
 		Thread.sleep(getNumberRandomForSecond(8546, 8677));
 		robot.pressEsc();
 		robot.pressEsc();
 	}
+	
+	private void followUsers() throws InterruptedException {
+		String[] hashtag = {"#followforfollow","#followback","#followme","#follow4follow","#FollowPyramid","#TEAMFOLLOWBACK",
+							"#SiguemeYTeSigo","#F4F"};
+		if(drive.searchElement(1, "//*[@data-testid='SearchBox_Search_Input']") != 0) {
+			drive.inputWrite(1, "//*[@data-testid='SearchBox_Search_Input']", hashtag[getNumberRandomForSecond(0, hashtag.length-1)], 114);
+			Thread.sleep(1450);
+			robot.enter();
+			
+			Thread.sleep(5050);
+			if(drive.searchElement(1, "//*[text()[contains(.,'Personas')]]") != 0 || drive.searchElement(1, "//*[text()[contains(.,'People')]]") != 0) {
+				if(drive.searchElement(1, "/html/body/div/div/div/div[2]/main/div/div/div/div/div/div[1]/div[2]/nav/div[2]/div[3]/a") != 0) {
+					drive.clickButton(1, "/html/body/div/div/div/div[2]/main/div/div/div/div/div/div[1]/div[2]/nav/div[2]/div[3]/a", "Personas xPath 1");
+				}else if(drive.searchElement(1, "//*[text()[contains(.,'Personas')]]") != 0) {
+					drive.clickButton(1, "//*[text()[contains(.,'Personas')]]", "Personas xPath");
+				}else if(drive.searchElement(1, "//*[text()[contains(.,'People')]]") != 0) {
+					drive.clickButton(1, "//*[text()[contains(.,'People')]]", "People xPath");
+				}
+				
+				Thread.sleep(1240);
+				//html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[1]/a/div/div[1]/div[1]/span/span
+				//html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[2]/div
+				//[2]/div/div/div/div[2]/div[1]/div[2]/div
+				int quantity_users = drive.getQuantityElements(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div") -3;
+				
+				if(quantity_users < 1) {
+					System.out.println("No hay usuarios para seguir");
+				}else {
+					for(int i = 1; i<=quantity_users; i++) {
+						if(drive.searchElement(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[2]/div") != 0) {
+							try {
+								drive.clickButton(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[2]/div", "Follow user "+i);
+								
+								System.out.println("El usuario a seguir es: "+drive.getText(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[1]/a/div/div[1]/div[1]/span/span"));
+								
+								robot.mouseScroll(1);
+							}catch(ElementClickInterceptedException e) {	
+							}
+
+						}
+						Thread.sleep(695);
+					}
+				}
+			}else {
+				robot.pressTab();
+				Thread.sleep(100);
+				robot.pressTab();
+				Thread.sleep(100);
+				robot.pressTab();
+				Thread.sleep(100);
+				robot.pressTab();
+				Thread.sleep(100);
+				robot.pressTab();
+				Thread.sleep(100);
+				robot.pressTab();
+				Thread.sleep(5000);
+				
+				int quantity_users = drive.getQuantityElements(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div") -3;
+				
+				if(quantity_users < 1) {
+					System.out.println("No hay usuarios para seguir");
+				}else {
+					for(int i = 1; i<=quantity_users; i++) {
+						if(drive.searchElement(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[2]/div") != 0) {
+							drive.clickButton(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[2]/div", "Follow user "+i);
+							
+							System.out.println("El usuario a seguir es: "+drive.getText(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[1]/a/div/div[1]/div[1]/span/span"));
+						}
+						Thread.sleep(895);
+					}
+				}
+				
+			}
+		}
+	}
+	
 	/**
 	 * Publicar imagen normal 
 	 * 
@@ -391,6 +524,7 @@ public class InicioController {
 	 * @param pie el pie de foto a escribir
 	 */
 	private void uploadImage() throws InterruptedException, SQLException {
+		System.out.println("SUBIR IMAGEN NORMAL TIPO MEME, COMIDA, ETC.");
 		Sub_Categorie subC = new Sub_Categorie();
 		
 		if(drive.searchElement(1, "//*[@data-testid='SideNav_NewTweet_Button']") != 0) {
@@ -422,7 +556,33 @@ public class InicioController {
 			drive.inputWriteFile(1, "/html/body/div/div/div/div[1]/div/div/div/div/div[2]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div[2]/div[2]/div/div/div[1]/input", path_P.getPath());
 			Thread.sleep(getNumberRandomForSecond(3546, 4677));
 			
-			drive.clickButton(1, "//*[@data-testid='tweetButton']", "TweetButton publicar");
+			try {
+				if(drive.searchElement(1, "//*[@data-testid='tweetButton']") != 0) {
+					drive.clickButton(1, "//*[@data-testid='tweetButton']", "TweetButton publicar");
+				}
+			}catch(ElementClickInterceptedException e) {
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.enter();
+			}catch(org.openqa.selenium.NoSuchElementException e1) {
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.enter();
+			}
+			
+			
+			
+			if(drive.searchElement(1, "//*[text()[contains(.,'Your account is suspended and is not permitted to send Tweets.')]]") != 0) {
+				userBlock = true;
+			}
 			Thread.sleep(getNumberRandomForSecond(8546, 8677));
 			robot.pressEsc();
 			robot.pressEsc();
@@ -433,6 +593,7 @@ public class InicioController {
 	}
 	
 	private void reviewMessage() throws InterruptedException {
+		System.out.println("REVISAR MENSAJES");
 		if(drive.searchElement(1, "//*[@aria-label='Mensajes Directos']") != 0) {
 			drive.clickButton(1, "//*[@aria-label='Mensajes Directos']", "Mensaje directo aria-label");
 		}else if(drive.searchElement(1, "//*[@data-testid='AppTabBar_DirectMessage_Link']") != 0) {
@@ -467,6 +628,7 @@ public class InicioController {
 	}
 	
 	private void reviewNotifaction() throws InterruptedException {
+		System.out.println("REVISAR NOTIFICACIONES");
 		if(drive.searchElement(1, "//*[@data-testid='AppTabBar_Notifications_Link']") != 0) {
 			drive.clickButton(1, "//*[@data-testid='AppTabBar_Notifications_Link']", "Notificaciones elemento data-testid");
 		}else if(drive.searchElement(1, "//*[@aria-label='Notificaciones']") != 0) {
@@ -479,28 +641,11 @@ public class InicioController {
 		Thread.sleep(getNumberRandomForSecond(1145 ,1457));
 		
 		System.out.println("Contar cantidad de notificaciones");
-//		int quantityNotifications = drive.getQuantityElements(1, "/html/body/div/div/div/div/main/div/div/div/div/div/div[2]/div/section/div/div/div/div");
-//		
-//		if(quantityNotifications == 0) {
-//			System.out.println("No hay notificaciones");
-//		}else {
-//			int randomNotification = getNumberRandomForSecond(1, quantityNotifications);
-//			
-//			try {
-//				drive.clickButton(1, "/html/body/div/div/div/div/main/div/div/div/div/div/div[2]/div/section/div/div/div/div["+randomNotification+"]/div/article", "Notificacion ");
-//				Thread.sleep(getNumberRandomForSecond(2145 ,2458));
-//				robot.mouseScroll(8);
-//				Thread.sleep(getNumberRandomForSecond(1145 ,1458));
-//				robot.mouseScroll(-8);
-//				Thread.sleep(getNumberRandomForSecond(1145 ,1457));
-//			}catch (Exception e) {
-//				e.getStackTrace();
-//			}
-//		}
 
 	}
 	
 	private String uploadImageFinal(String pie, String user, List<String> hash) throws InterruptedException {
+		System.out.println("SUBIR IMAGEN FINAL");
 		if(drive.searchElement(1, "//*[@data-testid='SideNav_NewTweet_Button']") != 0) {
 			drive.clickButton(1, "//*[@data-testid='SideNav_NewTweet_Button']", "Tweet");
 		}else if(drive.searchElement(1, "/html/body/div/div/div/div/header/div/div/div/div/div[3]/a") != 0) {
@@ -537,11 +682,40 @@ public class InicioController {
 			drive.inputWriteFile(1, "/html/body/div/div/div/div[1]/div/div/div/div/div[2]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div[2]/div[2]/div/div/div[1]/input", path.getPath());
 			Thread.sleep(getNumberRandomForSecond(3546, 4677));
 			
-			drive.clickButton(1, "//*[@data-testid='tweetButton']", "TweetButton publicar");
+			try {
+				if(drive.searchElement(1, "//*[@data-testid='tweetButton']") != 0) {
+					drive.clickButton(1, "//*[@data-testid='tweetButton']", "TweetButton publicar");
+				}
+			}catch(ElementClickInterceptedException e) {
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.enter();
+			}catch(org.openqa.selenium.NoSuchElementException e1) {
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.enter();
+			}
+			
+			if(drive.searchElement(1, "//*[text()[contains(.,'Your account is suspended and is not permitted to send Tweets.')]]") != 0) {
+				userBlock = true;
+			}
 			Thread.sleep(getNumberRandomForSecond(8546, 8677));
 			po.setGeneres_id(idGenere);
 			po.setPath_photos_id(path.getPath_photos_id());
 			po.setPhrases_id(phr.getPhrases_id());
+			robot.pressEsc();
+			Thread.sleep(125);
+			robot.pressEsc();
+			Thread.sleep(125);
+			robot.pressEsc();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
