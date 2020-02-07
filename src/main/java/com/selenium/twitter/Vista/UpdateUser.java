@@ -25,6 +25,13 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.awt.event.ActionEvent;
 
+/**
+ * La opción de actualizar se maneja por el aplicativo web
+ * 
+ * @deprecated
+ * @author Luis Morales
+ *
+ */
 public class UpdateUser {
 
 	private JFrame frmActualizarUsuario;
