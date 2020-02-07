@@ -208,6 +208,7 @@ public class User implements Model{
 	}
 	
 	public List<String[]> getUserCategorie(int id) throws SQLException{
+		date = new Date();
 		String[] list ;
 		ArrayList<String[]> lista = new ArrayList<String[]>();
 		
