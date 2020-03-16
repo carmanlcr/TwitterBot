@@ -20,12 +20,10 @@ public class Post implements Model{
 	private final String TABLE_NAME ="posts";
 	private int posts_id;
 	private int users_id;
-	private int generes_id;
-	private String link_post;
-	private String created_at; 
 	private int tasks_model_id;
-	private int path_photos_id;
-	private int phrases_id;
+	private int tasks_grid_id;
+	private String created_at;
+	private String updated_at;
 	private Calendar c = Calendar.getInstance();
 	private Date date = c.getTime();
 	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd H:m:s");
@@ -36,19 +34,18 @@ public class Post implements Model{
 	ResultSet rs;
 
 	public void insert() {
+		date = new Date();
 		setCreated_at(dateFormat.format(date));
-		
+		setUpdated_at(dateFormat.format(date));
 		try (Connection conexion = conn.conectar();){
- 			String insert = "INSERT INTO "+TABLE_NAME+"(users_id,generes_id,tasks_model_id,path_photos_id,phrases_id,link_post,created_at) "
-					+ " VALUE (?,?,?,?,?,?,?);";
+ 			String insert = "INSERT INTO "+TABLE_NAME+"(users_id,tasks_model_id,tasks_grid_id,created_at,updated_at) "
+					+ " VALUE (?,?,?,?,?);";
 			PreparedStatement  query = (PreparedStatement) conexion.prepareStatement(insert);
 			query.setInt(1, getUsers_id());
-			query.setInt(2, getGeneres_id());
-			query.setInt(3, getTasks_model_id());
-			query.setInt(4, getPath_photos_id());
-			query.setInt(5, getPhrases_id());
-			query.setString(6, getLink_post());
-			query.setString(7, getCreated_at());
+			query.setInt(2, getTasks_model_id());
+			query.setInt(3, getTasks_grid_id());
+			query.setString(4, getCreated_at());
+			query.setString(5, getUpdated_at());
 			query.executeUpdate();
 			
 		}catch(SQLException e) {
@@ -84,6 +81,36 @@ public class Post implements Model{
 				increment++;
 			}
 			rs.close();
+		}catch(Exception e) {
+			System.err.println(e);
+		}
+		
+		return list;
+	}
+	
+	public List<String[]> getCountPostUsers(int categories_id){
+		List<String[]> list = new ArrayList<String[]>();
+		String[] array = null;
+		int increment = 0;
+		String created_at = dateFormat1.format(date);
+		String query = " SELECT c.username usuario, COUNT(*) cuenta FROM "
+				+ " (SELECT us.username, pt.created_at "
+				+ " FROM users us "
+				+ " LEFT JOIN "+TABLE_NAME+" pt ON pt.users_id = us.users_id AND categories_id =  "+categories_id
+				+ " WHERE DATE(pt.created_at) = '"+created_at+"') AS c "
+				+ " GROUP BY c.username; ";
+		
+		try (Connection conexion = conn.conectar();
+				Statement st = conexion.createStatement();
+				ResultSet rs = st.executeQuery(query)){
+			
+			while (rs.next() ) {
+				array = new String[2];
+				array[0] = rs.getString("usuario");
+				array[1] = rs.getString("cuenta");
+				list.add(increment, array);
+				increment++;
+			}
 		}catch(Exception e) {
 			System.err.println(e);
 		}
@@ -172,22 +199,6 @@ public class Post implements Model{
 		this.posts_id = posts_id;
 	}
 
-	public int getGeneres_id() {
-		return generes_id;
-	}
-
-	public void setGeneres_id(int generes_id) {
-		this.generes_id = generes_id;
-	}
-
-	public String getCreated_at() {
-		return created_at;
-	}
-
-	public void setCreated_at(String created) {
-		this.created_at = created;
-	}
-
 	public int getUsers_id() {
 		return users_id;
 	}
@@ -204,29 +215,31 @@ public class Post implements Model{
 		this.tasks_model_id = tasks_model_id;
 	}
 
-	public String getLink_post() {
-		return link_post;
+	public int getTasks_grid_id() {
+		return tasks_grid_id;
 	}
 
-	public void setLink_post(String link_post) {
-		this.link_post = link_post;
+	public void setTasks_grid_id(int tasks_grid_id) {
+		this.tasks_grid_id = tasks_grid_id;
 	}
 
-	public int getPath_photos_id() {
-		return path_photos_id;
+	public String getCreated_at() {
+		return created_at;
 	}
 
-	public void setPath_photos_id(int path_photos_id) {
-		this.path_photos_id = path_photos_id;
+	public void setCreated_at(String created_at) {
+		this.created_at = created_at;
 	}
 
-	public int getPhrases_id() {
-		return phrases_id;
+	public String getUpdated_at() {
+		return updated_at;
 	}
 
-	public void setPhrases_id(int phrases_id) {
-		this.phrases_id = phrases_id;
+	public void setUpdated_at(String updated_at) {
+		this.updated_at = updated_at;
 	}
+
+
 
 
 	

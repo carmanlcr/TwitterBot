@@ -5,7 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import com.selenium.twitter.Interface.Model;
@@ -14,8 +17,13 @@ import com.selenium.twitter.Interface.Model;
 public class Vpn implements Model{
 	
 	private final String TABLE_NAME = "vpn";
+	private int vpn_id;
 	private String name;
-	private boolean activo;
+	private boolean active;
+	private String created_at;
+	private String updated_at;
+	private Date date;
+	private SimpleDateFormat simple = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private static Conexion conn = new Conexion();
 	
 	public List<String> getAllActive() throws SQLException {
@@ -76,6 +84,31 @@ public class Vpn implements Model{
 		return idVpn;
 	}
 	
+	public Vpn getVpn() throws SQLException {
+		Vpn v = null;
+		String sql = "SELECT  * FROM "+TABLE_NAME+" WHERE vpn_id = ?;";
+		
+		try (Connection conexion = conn.conectar();
+				PreparedStatement pre = conexion.prepareStatement(sql);){
+		
+			pre.setInt(1, getVpn_id());
+			
+			ResultSet rs = pre.executeQuery();
+			
+			if(rs.next()) {
+				v = new Vpn();
+				v.setVpn_id(rs.getInt("vpn_id"));
+				v.setName(rs.getString("name"));
+				v.setActive(rs.getBoolean("active"));
+			}
+		}catch (SQLException e) {
+			e.getStackTrace();
+		}
+		
+		return v;
+		
+	}
+	
 	public int findOrCreate(String name) throws SQLException {
 		int idVpn = 0;
 		String query = "SELECT * FROM "+TABLE_NAME+" WHERE UPPER(name) = '"+name.toUpperCase()+"';";
@@ -99,20 +132,41 @@ public class Vpn implements Model{
 	}
 	
 	public void insert() throws SQLException {
-		
-
-		try (Connection conexion = conn.conectar();){
-			String insert = "INSERT INTO "+TABLE_NAME+"(name) VALUES (?);";
-			PreparedStatement exe = conexion.prepareStatement(insert);
-			exe.setString(1, getName());
+		date = new Date();
+		setCreated_at(simple.format(date));
+		setUpdated_at(simple.format(date));
+		String insert = "INSERT INTO "+TABLE_NAME+"(name,created_at,updated_at) VALUES (?,?,?);";
+		try (Connection conexion = conn.conectar();
+				PreparedStatement exe = conexion.prepareStatement(insert);){
 			
+			exe.setString(1, getName());
+			exe.setString(2, getCreated_at());
+			exe.setString(3, getUpdated_at());
 			exe.executeUpdate();
 		} catch(Exception e)  {
 			System.err.println(e);
 		}
 			
-
+	}
+	
+	public HashMap<String,Integer> getAllVpn(){
+		HashMap<String,Integer> mapGe = new HashMap<String,Integer>();
 		
+		String query = "SELECT * FROM "+TABLE_NAME+" v WHERE active = 1;";
+		
+		try (Connection conexion = conn.conectar();){
+			PreparedStatement pst = conexion.prepareStatement(query);
+			ResultSet rs = pst.executeQuery();
+			while (rs.next() ) {
+				mapGe.put(rs.getString("v.name"), rs.getInt("v.vpn_id"));
+			}
+		}catch(SQLException e) {
+			System.err.println(e);
+		}
+		
+		
+		
+		return mapGe;
 	}
 	
 	@Override
@@ -120,6 +174,14 @@ public class Vpn implements Model{
 		
 	}
 	
+	public int getVpn_id() {
+		return vpn_id;
+	}
+
+	public void setVpn_id(int vpn_id) {
+		this.vpn_id = vpn_id;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -128,12 +190,28 @@ public class Vpn implements Model{
 		this.name = name;
 	}
 	
-	public boolean isActivo() {
-		return activo;
+	public boolean isActive() {
+		return active;
 	}
 
-	public void setActivo(boolean activo) {
-		this.activo = activo;
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	public String getCreated_at() {
+		return created_at;
+	}
+
+	public void setCreated_at(String created_at) {
+		this.created_at = created_at;
+	}
+
+	public String getUpdated_at() {
+		return updated_at;
+	}
+
+	public void setUpdated_at(String updated_at) {
+		this.updated_at = updated_at;
 	}
 
 	

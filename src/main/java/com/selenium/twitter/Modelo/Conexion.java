@@ -16,7 +16,7 @@ public class Conexion {
     public Connection conectar() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connect = (Connection) DriverManager.getConnection(URL + BD, USER, PASSWORD);
+            connect = (Connection) DriverManager.getConnection(URL + BD+"?useSSL=false", USER, PASSWORD);
         
         }catch(SQLException e1) {
         	System.err.println("Error al conectarse a la base de datos "+e1);

@@ -4,20 +4,26 @@ package com.selenium.twitter.Vista;
 
 import com.selenium.twitter.Modelo.*;
 
+import configurations.controller.SikuliTest;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import org.sikuli.script.Screen;
+
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.awt.event.ActionEvent;
 import javax.swing.JMenuBar;
 import java.awt.Color;
@@ -36,12 +42,11 @@ public class InicioFrameT extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+	private final String VERSION = "2.0.0";
 	private JPanel contentPane;
 	private final JMenuBar menuBar = new JMenuBar();
 	private final JMenu mnUsuarios = new JMenu("Usuarios");
 	private final JMenuItem registrarUsuario = new JMenuItem("Registrar");
-	private final JMenuItem importarUsuarios = new JMenuItem("Importar Usuarios");
 	private final JMenuItem buscarUsuario = new JMenuItem("Buscar");
 	private final JMenuItem actualizarUsuario = new JMenuItem("Actualizar Usuarios");
 	private final JMenu mnVpn = new JMenu("Vpn");
@@ -59,19 +64,48 @@ public class InicioFrameT extends JFrame {
 	private final JMenuItem registrarTarea = new JMenuItem("Registrar Tarea");
 	private final JMenu mnPhotos = new JMenu("Fotos");
 	private final JMenuItem registrarDireccionDeFotos = new JMenuItem("Registrar Fotos"); 
-	public ArrayList<JTextArea> textA = new ArrayList<JTextArea>();
-	private static Categories cate = new Categories();
-	private static JComboBox<String> comboBox;
-	private JButton empezar = new JButton("Comenzar");
+	public ArrayList<JTextArea> textA = new ArrayList<>();
+	private static JComboBox<String> comboBox = new JComboBox<>();
+	private static JComboBox<String> comboBox_1 = new JComboBox<>();
+	private static HashMap<String, Integer> hashCa;
+	private static HashMap<String, Integer> hashGe = new HashMap<>();
+	private static JButton empezar = new JButton("Comenzar");
+	private final JLabel lblNewLabel_1 = new JLabel("Campaña");
+	private final JLabel lblNewLabel_2 = new JLabel("Genero");
 	private static Inicio_Aplicacion iniApli = new Inicio_Aplicacion();
+	private static Screen s;
 	
 	/**
 	 * Launch the application.
 	 * @throws SQLException 
 	 */
 	public static void main(String[] args) throws SQLException {
-		List<String> list = cate.getAllActive();
-		comboBox = setComboBox(list);
+		SikuliTest si = new SikuliTest();
+		si.run();
+		s = si.getScreen();
+		
+		
+		final Task_Grid task_G = new Task_Grid();
+		hashCa = task_G.getCategoriesToday();
+		setComboBox(hashCa);
+		
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				comboBox_1.removeAll();
+				comboBox_1.removeAllItems();
+				task_G.setCategories_id(Integer.parseInt(hashCa.get(comboBox.getSelectedItem().toString()).toString()));
+				hashGe = task_G.getCategoriesAndGeneresToday();
+				for(String st : hashGe.keySet()) comboBox_1.addItem(st);
+				
+				if(hashGe.size() > 0) {
+					empezar.setEnabled(true);
+				}
+			}
+		});
+		
+		if(hashGe.size() > 0) {
+			empezar.setEnabled(true);
+		}
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -120,19 +154,6 @@ public class InicioFrameT extends JFrame {
 		
 		mnUsuarios.add(registrarUsuario);
 		
-		importarUsuarios.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					ImportUsers impo = new ImportUsers();
-					impo.inicio();
-				}catch (Exception e1) {
-					System.err.println(e1);
-				}
-			}
-		});
-		
-		mnUsuarios.add(importarUsuarios);
-		
 		buscarUsuario.setEnabled(false);
 		
 		mnUsuarios.add(buscarUsuario);
@@ -149,6 +170,7 @@ public class InicioFrameT extends JFrame {
 		
 		
 		mnUsuarios.add(actualizarUsuario);
+
 		mnVpn.setFont(new Font("Arial", Font.BOLD, 12));
 		
 		menuBar.add(mnVpn);
@@ -261,37 +283,60 @@ public class InicioFrameT extends JFrame {
 			}
 		});
 		
+		JLabel lblNewLabel = new JLabel(VERSION);
+		lblNewLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+		
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGap(139)
-					.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 213, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(191, Short.MAX_VALUE)
-					.addGap(80)
-					.addComponent(empezar)
-					.addContainerGap(191, Short.MAX_VALUE))
+					.addGap(36)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(lblNewLabel_2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(lblNewLabel_1, GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE))
+							.addGap(65)
+							.addGroup(gl_contentPane.createParallelGroup(Alignment.LEADING)
+								.addComponent(comboBox_1, GroupLayout.PREFERRED_SIZE, 213, GroupLayout.PREFERRED_SIZE)
+								.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 213, GroupLayout.PREFERRED_SIZE))
+							.addContainerGap(170, Short.MAX_VALUE))
+						.addGroup(gl_contentPane.createSequentialGroup()
+							.addComponent(lblNewLabel)
+							.addPreferredGap(ComponentPlacement.RELATED, 348, Short.MAX_VALUE)
+							.addComponent(empezar)
+							.addGap(43))))
 		);
+		
 		gl_contentPane.setVerticalGroup(
-			gl_contentPane.createParallelGroup(Alignment.LEADING)
+			gl_contentPane.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPane.createSequentialGroup()
-					.addGap(81)
-					.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(204, Short.MAX_VALUE)
-					.addGap(81)
-					.addComponent(empezar,GroupLayout.PREFERRED_SIZE,50,GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(204, Short.MAX_VALUE))
+					.addGap(62)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_1))
+					.addGap(38)
+					.addGroup(gl_contentPane.createParallelGroup(Alignment.BASELINE)
+						.addComponent(comboBox_1, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblNewLabel_2))
+					.addPreferredGap(ComponentPlacement.RELATED, 85, Short.MAX_VALUE)
+					.addComponent(lblNewLabel)
+					.addGap(46))
+				.addGroup(gl_contentPane.createSequentialGroup()
+					.addContainerGap(238, Short.MAX_VALUE)
+					.addComponent(empezar, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE)
+					.addGap(36))
 		);
 		contentPane.setLayout(gl_contentPane);
 		
-		iniApli.setVersion("1.0.0");
-		iniApli.insert();
+		iniApli.setVersion(VERSION);
 		empezar.addActionListener(new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
 				try {
-					int id = cate.getIdCategories((String) comboBox.getSelectedItem());
-					Ejecucion eje = new Ejecucion(id);
+					int id = Integer.parseInt(hashCa.get(comboBox.getSelectedItem().toString()).toString());
+					int id_genere = Integer.parseInt(hashGe.get(comboBox_1.getSelectedItem().toString()).toString());
+					Ejecucion eje = new Ejecucion(id,id_genere,iniApli,s);
 					setExtendedState(ICONIFIED);
 					eje.inicio();
 				} catch (SQLException e1) {
@@ -303,10 +348,10 @@ public class InicioFrameT extends JFrame {
 		});
 	}
 	
-	private static JComboBox<String> setComboBox(List<String> map) {
+	private static JComboBox<String> setComboBox(HashMap<String, Integer> map) {
 		comboBox = new JComboBox<String>();
 		
-		for (String string : map) {
+		for (String string : map.keySet()) {
 			comboBox.addItem(string);
 		}
 	    return comboBox;

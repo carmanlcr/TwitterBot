@@ -1,17 +1,21 @@
 package com.selenium.twitter.Controlador;
+
+import configurations.controller.*;
+
 public class IniciaSesion {
 	
 	private String username;
 	private String password;
 	private DriverController dr;
-	private final String TWITTER_URL_LOGIN = "https://twitter.com/login";
+	private static final String TWITTER_URL_LOGIN = "https://twitter.com/login";
+	private RobotController robot;
 	
 	
-	
-	public IniciaSesion(DriverController dr,String username, String password) {
+	public IniciaSesion(DriverController dr,String username, String password, RobotController robot) {
 		this.dr = dr;
 		this.username = username;
 		this.password = password;
+		this.robot = robot;
 	}
 	
 	/**
@@ -53,6 +57,30 @@ public class IniciaSesion {
 			dr.inputWrite(1, "/html/body/div/div/div/div[2]/main/div/div/form/div/div[2]/label/div[2]/div/input", password, 110);
 			
 			dr.clickButton(1, "/html/body/div/div/div/div[2]/main/div/div/form/div/div[3]/div", "Click Button xPath");
+		}else if(dr.searchElementAppium(1, "/html/body/div/div/div/div[1]/main/div/div/form/div/div[1]/label/div/div[2]/div/input") != 0) {
+			dr.inputWrite(1, "/html/body/div/div/div/div[1]/main/div/div/form/div/div[1]/label/div/div[2]/div/input", username, 110);
+			
+			dr.inputWrite(1, "/html/body/div/div/div/div[1]/main/div/div/form/div/div[2]/label/div/div[2]/div/input", password, 110);
+			
+			if(dr.searchElement(1, "/html/body/div/div/div/div[1]/main/div/div/form/div/div[3]/div") != 0) {
+				dr.clickButton(1, "/html/body/div/div/div/div[1]/main/div/div/form/div/div[3]/div", "button iinit sesion xPath");
+			}else if(dr.searchElement(1, "//input[@type='Iniciar sesión']") != 0) {
+				dr.clickButton(1, "//input[@type='Iniciar sesión']", "Iniciar sesion xPath");
+			}
+		}else {
+			robot.inputWrite(username);
+			
+			Thread.sleep(850);
+			
+			robot.pressTab();
+			
+			Thread.sleep(850);
+			
+			robot.inputWrite(password);
+
+			Thread.sleep(850);
+			
+			robot.enter();
 		}
 		
 	}
