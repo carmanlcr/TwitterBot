@@ -10,19 +10,22 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
+
 
 
 public class HashTag implements Model{
 
-	private final String TABLE_NAME = "hashtag";
+	private static final String TABLE_NAME = "hashtag";
 	private String name;
 	private boolean active;
 	private int created_at;
 	private int categories_id;
 	private int sub_categories_id;
 	private int generes_id;
-	private static Conexion conn = new Conexion();
+	private static ConnectionTW conn = new ConnectionTW();
 	
 	public void insert() throws SQLException {
 		
@@ -64,13 +67,15 @@ public class HashTag implements Model{
 		int indice = 0;
 		
 		ResultSet rs = null;
-		try (Connection conexion = conn.conectar();){
+		String queryExce = "SELECT ht.name FROM "+TABLE_NAME+" ht "
+				+ "WHERE ht.active = ? AND ht.generes_id = ? "
+				+ "AND ht.categories_id = ? "
+				+ "ORDER BY RAND() LIMIT 4;";
+		try (Connection conexion = conn.conectar();
+				PreparedStatement  query =  conexion.prepareStatement(queryExce);){
 			
-			String queryExce = "SELECT ht.name FROM "+TABLE_NAME+" ht "
-					+ "WHERE ht.active = ? AND ht.generes_id = ? "
-					+ "AND ht.categories_id = ? "
-					+ "ORDER BY RAND() LIMIT 4;";
-			PreparedStatement  query = (PreparedStatement) conexion.prepareStatement(queryExce);
+			
+			
 			query.setInt(1, 1);
 			query.setInt(2, getGeneres_id());
 			query.setInt(3, getCategories_id());
@@ -88,7 +93,7 @@ public class HashTag implements Model{
  	}
 	
 	public List<String> getHashTagForCategories(){
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		
 		
 		ResultSet rs = null;

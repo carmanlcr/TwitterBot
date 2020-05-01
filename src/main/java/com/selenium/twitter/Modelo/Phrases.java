@@ -8,19 +8,21 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
 
 
 public class Phrases implements Model{
 	
-	private final String TABLE_NAME = "phrases";
+	private static final String TABLE_NAME = "phrases";
 	private int phrases_id;
 	private String phrase;
 	private boolean active;
 	private int categories_id;
 	private int sub_categories_id;
 	private int generes_id;
-	private Conexion conn = new Conexion();
+	private ConnectionTW conn = new ConnectionTW();
 	
 	
 	public void insert() throws SQLException {

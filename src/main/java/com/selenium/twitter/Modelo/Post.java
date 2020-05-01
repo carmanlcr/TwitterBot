@@ -12,12 +12,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
 
 
 public class Post implements Model{
 	
-	private final String TABLE_NAME ="posts";
+	private static final String TABLE_NAME ="posts";
 	private int posts_id;
 	private int users_id;
 	private int tasks_model_id;
@@ -29,7 +31,7 @@ public class Post implements Model{
 	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd H:m:s");
 	private DateFormat dateFormat1 = new SimpleDateFormat("yyyy-MM-dd");
 	
-	private static Conexion conn = new Conexion();
+	private static ConnectionTW conn = new ConnectionTW();
 	Statement st;
 	ResultSet rs;
 
@@ -37,10 +39,12 @@ public class Post implements Model{
 		date = new Date();
 		setCreated_at(dateFormat.format(date));
 		setUpdated_at(dateFormat.format(date));
-		try (Connection conexion = conn.conectar();){
- 			String insert = "INSERT INTO "+TABLE_NAME+"(users_id,tasks_model_id,tasks_grid_id,created_at,updated_at) "
-					+ " VALUE (?,?,?,?,?);";
-			PreparedStatement  query = (PreparedStatement) conexion.prepareStatement(insert);
+		String insert = "INSERT INTO "+TABLE_NAME+"(users_id,tasks_model_id,tasks_grid_id,created_at,updated_at) "
+				+ " VALUE (?,?,?,?,?);";
+		try (Connection conexion = conn.conectar();
+				PreparedStatement  query = conexion.prepareStatement(insert);){
+ 			
+			
 			query.setInt(1, getUsers_id());
 			query.setInt(2, getTasks_model_id());
 			query.setInt(3, getTasks_grid_id());
@@ -56,7 +60,7 @@ public class Post implements Model{
 	}
 	
 	public List<String[]> getCountPostUsers(){
-		List<String[]> list = new ArrayList<String[]>();
+		List<String[]> list = new ArrayList<>();
 		String[] array = null;
 		int increment = 0;
 		String created_at = dateFormat1.format(date);

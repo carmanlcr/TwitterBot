@@ -8,15 +8,18 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
 
 
 public class Categories implements Model{
 
-	private final String TABLE_NAME = "categories";
+	private static final String TABLE_NAME = "categories";
 	private String name;
-	private static Conexion conn = new Conexion();
+	private static ConnectionTW conn = new ConnectionTW();
 	
 	
 	public void insert() {
@@ -140,9 +143,9 @@ public class Categories implements Model{
 		return concat;
 	}
 	
-	public HashMap<String, Integer> getComboBox(){
-		HashMap<String, Integer> map = new HashMap<String, Integer>();
-		String sql = "SELECT * FROM "+TABLE_NAME+" WHERE active = ? ORDER BY name ASC";
+	public Map<String, Integer> getComboBox(){
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		String sql = "SELECT * FROM "+TABLE_NAME+" WHERE active = ?;";
 		ResultSet rs = null;
 		try (Connection conexion = conn.conectar();
 				PreparedStatement pre = conexion.prepareStatement(sql)){

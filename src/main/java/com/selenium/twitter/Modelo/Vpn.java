@@ -11,12 +11,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
 
 
 public class Vpn implements Model{
 	
-	private final String TABLE_NAME = "vpn";
+	private static final String TABLE_NAME = "vpn";
 	private int vpn_id;
 	private String name;
 	private boolean active;
@@ -24,10 +26,10 @@ public class Vpn implements Model{
 	private String updated_at;
 	private Date date;
 	private SimpleDateFormat simple = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private static Conexion conn = new Conexion();
+	private static ConnectionTW conn = new ConnectionTW();
 	
 	public List<String> getAllActive() throws SQLException {
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 	    String query = "SELECT name FROM "+TABLE_NAME+" WHERE active = 1 ORDER BY name ASC";
 		try (Connection conexion = conn.conectar();
 				Statement st = conexion.createStatement();
@@ -37,7 +39,6 @@ public class Vpn implements Model{
 				list.add(rs.getString("name"));
                
 			}
-			conexion.close();
 		}catch(Exception e) {
 			System.err.println(e);
 		}
@@ -157,6 +158,7 @@ public class Vpn implements Model{
 		try (Connection conexion = conn.conectar();){
 			PreparedStatement pst = conexion.prepareStatement(query);
 			ResultSet rs = pst.executeQuery();
+			mapGe.put("SIN VPN", 0);
 			while (rs.next() ) {
 				mapGe.put(rs.getString("v.name"), rs.getInt("v.vpn_id"));
 			}

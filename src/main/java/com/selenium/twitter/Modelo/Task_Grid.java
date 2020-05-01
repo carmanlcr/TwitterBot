@@ -9,14 +9,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
 
 
 
 public class Task_Grid implements Model {
 	
-	private final String TABLE_NAME = "tasks_grid";
+	private static final String TABLE_NAME = "tasks_grid";
 	private int tasks_grid_id;
 	private int categories_id;
 	private int generes_id;
@@ -33,17 +36,17 @@ public class Task_Grid implements Model {
 	private String updated_at;
 	private int db_admin_tasks_id;
 	private Date date;
-	private Conexion conn = new Conexion();
+	private ConnectionTW conn = new ConnectionTW();
 	private SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");
 	
 	@Override
 	public void insert() throws SQLException {
-
+		//None
 	}
 
 	
-	public HashMap<String, Integer> getCategoriesToday(){
-		HashMap<String, Integer> hash = new HashMap<String, Integer>();
+	public Map<String, Integer> getCategoriesToday(){
+		Map<String, Integer> hash = new HashMap<>();
 		String query = "SELECT DISTINCT(ca.categories_id) categories_id,ca.name FROM "+TABLE_NAME+" tg " +
 				"INNER JOIN tasks_grid_detail tgd ON tgd.tasks_grid_id = tg.tasks_grid_id " +
 				"INNER JOIN categories ca ON ca.categories_id = tg.categories_id " + 
@@ -68,8 +71,8 @@ public class Task_Grid implements Model {
 		return hash;
 	}
 	
-	public HashMap<String, Integer> getCategoriesAndGeneresToday(){
-		HashMap<String, Integer> hash = new HashMap<String, Integer>();
+	public Map<String, Integer> getCategoriesAndGeneresToday(){
+		HashMap<String, Integer> hash = new HashMap<>();
 		String query = "SELECT DISTINCT(ge.generes_id) generes_id,ge.name FROM "+TABLE_NAME+" tg " +
 				"INNER JOIN tasks_grid_detail tgd ON tgd.tasks_grid_id = tg.tasks_grid_id " +
 				"INNER JOIN generes ge ON ge.generes_id = tg.generes_id " + 
@@ -98,7 +101,7 @@ public class Task_Grid implements Model {
 	
 	
 	public List<Task_Grid> getTaskGridToday() throws SQLException{
-		List<Task_Grid> list = new ArrayList<Task_Grid>();
+		List<Task_Grid> list = new ArrayList<>();
 		Task_Grid taskG = null;
 		String query = "SELECT * FROM "+TABLE_NAME+" tg " + 
 				"INNER JOIN tasks_grid_detail tgd ON tg.tasks_grid_id = tgd.tasks_grid_id " + 
@@ -296,7 +299,7 @@ public class Task_Grid implements Model {
 
 	@Override
 	public void update() throws SQLException {
-		// TODO Auto-generated method stub
+		// None
 		
 	}
 

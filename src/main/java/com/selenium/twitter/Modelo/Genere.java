@@ -11,11 +11,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
 
 
 public class Genere implements Model{
-	private final String TABLE_NAME = "generes";
+	private static final String TABLE_NAME = "generes";
 	private int generes_id;
 	private String name;
 	private String created_at;
@@ -23,7 +25,7 @@ public class Genere implements Model{
 	private boolean active;
 	private Date date = new Date();
 	private DateFormat dateFormatDateTime = new SimpleDateFormat("yyyy-MM-dd H:m:s");
-	private static Conexion conn = new Conexion();
+	private static ConnectionTW conn = new ConnectionTW();
 	Statement st;
 	ResultSet rs;
 	
@@ -33,7 +35,7 @@ public class Genere implements Model{
 		String insert = "INSERT INTO "+TABLE_NAME+"(name,created_at,categories_id) VALUE "
 				+ " (?,?,?);";
 		try (Connection conexion = conn.conectar();
-				PreparedStatement exe = (PreparedStatement) conexion.prepareStatement(insert);){
+				PreparedStatement exe = conexion.prepareStatement(insert);){
 			exe.setString(1, getName());
 			exe.setString(2, getCreated_at());
 			exe.setInt(3, getCategories_id());

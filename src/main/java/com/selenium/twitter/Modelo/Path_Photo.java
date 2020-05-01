@@ -9,11 +9,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
 
 public class Path_Photo implements Model {
 	
-	private final String TABLE_NAME = "path_photos";
+	private static final String TABLE_NAME = "path_photos";
 	private int path_photos_id;
 	private String path;
 	private boolean active;
@@ -23,7 +25,7 @@ public class Path_Photo implements Model {
 	private int generes_id;
 	private Date date = new Date();
 	private DateFormat dateFormatDateTime = new SimpleDateFormat("yyyy-MM-dd H:m:s");
-	private static Conexion conn = new Conexion();
+	private static ConnectionTW conn = new ConnectionTW();
 	ResultSet rs;
 	
 	public void insert() throws SQLException {

@@ -13,12 +13,14 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
 
 
 public class User implements Model{
 	
-	private final String TABLE_NAME = "users";
+	private static final String TABLE_NAME = "users";
 	private int users_id;
 	private String username;
 	private String email;
@@ -32,7 +34,7 @@ public class User implements Model{
 	private int vpn_id;
 	private boolean active;
 	private boolean isBlock;
-	private static Conexion conn = new Conexion();
+	private static ConnectionTW conn = new ConnectionTW();
 	private Date date;
 	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd H:m:s");
 	private String created_at;

@@ -5,6 +5,12 @@ import java.sql.SQLException;
 
 import java.sql.Connection;
 
+/**
+ * Movido al proyecto Configurations
+ * 
+ * @author Luis Morales
+ * @deprecated
+ */
 public class Conexion {
 	private final String URL = "jdbc:mysql://192.168.2.6:3306/"; // Ubicaci�n de la BD.
     private final String BD = "twitter"; // Nombre de la BD.

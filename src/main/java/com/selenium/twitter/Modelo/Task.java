@@ -7,29 +7,32 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
 
 
 public class Task implements Model{
 	
-	private final String TABLE_NAME = "tasks";
+	private static final String TABLE_NAME = "tasks";
 	private String name;
 	private String created_at;
 	private boolean active;
 	private Date date = new Date();
 	private DateFormat dateFormatDateTime = new SimpleDateFormat("yyyy-MM-dd H:m:s");
-	private static Conexion conn = new Conexion();
+	private static ConnectionTW conn = new ConnectionTW();
 	Statement st;
 	ResultSet rs;
 	
 	public void insert() throws SQLException {
 		
 		setCreated_at(dateFormatDateTime.format(date));
-		
-		try (Connection conexion = conn.conectar();){
-			String insert = "INSERT INTO "+TABLE_NAME+"(name,created_at) VALUE "
-					+ " (?,?);";
-			PreparedStatement exe = conexion.prepareStatement(insert);
+		String insert = "INSERT INTO "+TABLE_NAME+"(name,created_at) VALUE "
+				+ " (?,?);";
+		try (Connection conexion = conn.conectar();
+				PreparedStatement exe = conexion.prepareStatement(insert);){
+			
+			
 			exe.setString(1, getName());
 			exe.setString(2, getCreated_at());
 			exe.executeUpdate();

@@ -11,26 +11,30 @@ import java.util.Date;
 import java.util.List;
 
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
 
 
 public class Sub_Categorie implements Model {
 	
-	private final String TABLE_NAME = "sub_categories";
+	private static final String TABLE_NAME = "sub_categories";
 	private int sub_categories_id;
 	private String name;
 	private int categories_id;
-	private static Conexion conn = new Conexion();
+	private static ConnectionTW conn = new ConnectionTW();
 	
 	public void insert() throws SQLException {
 		
 		Date date = new Date();
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd H:m:s");
 		String strDate= formatter.format(date);
-			try (Connection conexion = conn.conectar();){
-				String insert = "INSERT INTO "+TABLE_NAME+"(name,categories_id,created_at,updated_at) "
-						+ "VALUES (?,?,?,?);";
-				PreparedStatement exe = conexion.prepareStatement(insert);
+		String insert = "INSERT INTO "+TABLE_NAME+"(name,categories_id,created_at,updated_at) "
+				+ "VALUES (?,?,?,?);";
+			try (Connection conexion = conn.conectar();
+					PreparedStatement exe = conexion.prepareStatement(insert);){
+				
+				
 				exe.setString(1, getName());
 				exe.setInt(2, getCategories_id());
 				exe.setString(3, strDate);

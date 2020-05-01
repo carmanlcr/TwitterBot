@@ -9,12 +9,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
 
 
 public class User_Block implements Model{
 
-	private final String TABLE_NAME = "users_block";
+	private static final String TABLE_NAME = "users_block";
 	private int users_id;
 	private boolean active;
 	private String comentario;
@@ -23,7 +25,7 @@ public class User_Block implements Model{
 	private Date date = new Date();
 	private DateFormat dateFormatDate = new SimpleDateFormat("yyyy-MM-dd");
 	private DateFormat dateFormatDateTime = new SimpleDateFormat("yyyy-MM-dd H:m:s");
-	private static Conexion conn = new Conexion();
+	private static ConnectionTW conn = new ConnectionTW();
 	Statement st;
 	ResultSet rs;
 	
@@ -31,11 +33,12 @@ public class User_Block implements Model{
 	public void insert() {
 		setCreated_at(dateFormatDate.format(date));
 		setUpdated_at(dateFormatDateTime.format(date));
-		
-		try (Connection conexion = conn.conectar();){
-			String insert = "INSERT INTO "+TABLE_NAME+"(users_id,comentario,created_at,updated_at) VALUE "
-					+ " (?,?,?,?);";
-			PreparedStatement exe = conexion.prepareStatement(insert);
+		String insert = "INSERT INTO "+TABLE_NAME+"(users_id,comentario,created_at,updated_at) VALUE "
+				+ " (?,?,?,?);";
+		try (Connection conexion = conn.conectar();
+				PreparedStatement exe = conexion.prepareStatement(insert);){
+			
+			
 			exe.setInt(1, getUsers_id());
 			exe.setString(2, getComentario());
 			exe.setString(3, getCreated_at());
@@ -71,8 +74,9 @@ public class User_Block implements Model{
 		User user = new User();
 		user.setUsername(username);
 		
-		try (Connection conexion = conn.conectar();){
-			PreparedStatement pst = conexion.prepareStatement(query);
+		try (Connection conexion = conn.conectar();
+				PreparedStatement pst = conexion.prepareStatement(query);){
+			
 			pst.setBoolean(1,false);
 			pst.setString(2, getUpdated_at());
 			pst.setInt(3, user.getIdUser());
@@ -132,7 +136,7 @@ public class User_Block implements Model{
 
 	@Override
 	public void update() throws SQLException {
-		// TODO Auto-generated method stub
+		// NONE
 		
 	}
 }

@@ -5,16 +5,18 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.selenium.twitter.Interface.Model;
+
+import configurations.connection.ConnectionTW;
+import configurations.interfaces.Model;
 
 
 public class Post_Detail implements Model {
 
-	private final String TABLE_NAME = "posts_detail";
+	private static final String TABLE_NAME = "posts_detail";
 	private int posts_id;
 	private int hashtag_id;
 	private String created_at;
-	private static Conexion conn = new Conexion();
+	private static ConnectionTW conn = new ConnectionTW();
 	private Date date = new Date();
 	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd H:m:s");
 	Statement st;
@@ -22,11 +24,12 @@ public class Post_Detail implements Model {
 	
 	public void insert() throws SQLException {
 		setCreated_at(dateFormat.format(date));
-		
-		try (Connection conexion = conn.conectar();){
-			String insert = "INSERT INTO "+TABLE_NAME+"(posts_id,hashtag_id,created_at) "
-					+ " VALUE (?,?,?);";
-			PreparedStatement exe = conexion.prepareStatement(insert);
+		String insert = "INSERT INTO "+TABLE_NAME+"(posts_id,hashtag_id,created_at) "
+				+ " VALUE (?,?,?);";
+		try (Connection conexion = conn.conectar();
+				PreparedStatement exe = conexion.prepareStatement(insert);){
+			
+			
 			exe.setInt(1, getPosts_id());
 			exe.setInt(2, getHashtag_id());
 			exe.setString(3, getCreated_at());
@@ -38,7 +41,7 @@ public class Post_Detail implements Model {
 	
 	@Override
 	public void update() throws SQLException {
-		
+		//None
 	}
 	
 	
