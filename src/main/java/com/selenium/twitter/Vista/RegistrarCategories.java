@@ -18,6 +18,13 @@ import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
+/**
+ * Movido al app web
+ * 
+ * @author Luis Morales
+ * @deprecated
+ */
 public class RegistrarCategories extends JFrame {
 
 	/**

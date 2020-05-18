@@ -26,6 +26,12 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+/**
+ * Movido al app web
+ * 
+ * @author Luis Morales
+ * @deprecated
+ */
 public class RegistrarDireccionFotos extends JFrame {
 
 	/**

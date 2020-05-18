@@ -23,6 +23,13 @@ import java.awt.event.ActionEvent;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JComboBox;
 
+
+/**
+ * Movido al app web
+ * 
+ * @author Luis Morales
+ * @deprecated
+ */
 public class RegistrarGenero extends JFrame {
 
 	/**

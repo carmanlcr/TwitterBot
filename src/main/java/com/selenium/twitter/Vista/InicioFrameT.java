@@ -2,6 +2,7 @@ package com.selenium.twitter.Vista;
 
 
 
+import com.selenium.facebook.Vista.Ejecucion;
 import com.selenium.twitter.Modelo.*;
 
 import configurations.controller.SikuliTest;
@@ -21,9 +22,12 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JButton;
 
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.awt.event.ActionEvent;
 import javax.swing.JMenuBar;
 import java.awt.Color;
@@ -42,33 +46,21 @@ public class InicioFrameT extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private final String VERSION = "2.0.0";
+	private static final String VERSION = "2.0.6";
 	private JPanel contentPane;
 	private final JMenuBar menuBar = new JMenuBar();
 	private final JMenu mnUsuarios = new JMenu("Usuarios");
-	private final JMenuItem registrarUsuario = new JMenuItem("Registrar");
 	private final JMenuItem buscarUsuario = new JMenuItem("Buscar");
-	private final JMenuItem actualizarUsuario = new JMenuItem("Actualizar Usuarios");
 	private final JMenu mnVpn = new JMenu("Vpn");
 	private final JMenuItem registrarVpn = new JMenuItem("Registrar");
 	private final JMenuItem actualizarVpn = new JMenuItem("Actualizar");
-	private final JMenu mnCategorias = new JMenu("Categorias");
-	private final JMenuItem registrarCategoria = new JMenuItem("Registrar");
-	private final JMenuItem mntmRegistrarSubCategorie = new JMenuItem("Registrar Sub Categoria");
-	private final JMenu mnFrases = new JMenu("Frases");
-	private final JMenuItem registrarFrase = new JMenuItem("Registrar");
-	private final JMenuItem registrarHashTag = new JMenuItem("Registrar Hashtag"); 
-	private final JMenu mnGenero = new JMenu("Genero");
-	private final JMenuItem registrarGenero = new JMenuItem("Registrar Genero");
 	private final JMenu mnTask = new JMenu("Tarea");
 	private final JMenuItem registrarTarea = new JMenuItem("Registrar Tarea");
-	private final JMenu mnPhotos = new JMenu("Fotos");
-	private final JMenuItem registrarDireccionDeFotos = new JMenuItem("Registrar Fotos"); 
-	public ArrayList<JTextArea> textA = new ArrayList<>();
+	public List<JTextArea> textA = new ArrayList<>();
 	private static JComboBox<String> comboBox = new JComboBox<>();
 	private static JComboBox<String> comboBox_1 = new JComboBox<>();
-	private static HashMap<String, Integer> hashCa;
-	private static HashMap<String, Integer> hashGe = new HashMap<>();
+	private static Map<String, Integer> hashCa;
+	private static Map<String, Integer> hashGe = new HashMap<>();
 	private static JButton empezar = new JButton("Comenzar");
 	private final JLabel lblNewLabel_1 = new JLabel("Campaña");
 	private final JLabel lblNewLabel_2 = new JLabel("Genero");
@@ -79,45 +71,58 @@ public class InicioFrameT extends JFrame {
 	 * Launch the application.
 	 * @throws SQLException 
 	 */
-	public static void main(String[] args) throws SQLException {
+	public static void main(String[] args)  {
 		SikuliTest si = new SikuliTest();
 		si.run();
 		s = si.getScreen();
 		
 		
-		final Task_Grid task_G = new Task_Grid();
-		hashCa = task_G.getCategoriesToday();
-		setComboBox(hashCa);
-		
-		comboBox.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				comboBox_1.removeAll();
-				comboBox_1.removeAllItems();
-				task_G.setCategories_id(Integer.parseInt(hashCa.get(comboBox.getSelectedItem().toString()).toString()));
-				hashGe = task_G.getCategoriesAndGeneresToday();
-				for(String st : hashGe.keySet()) comboBox_1.addItem(st);
-				
-				if(hashGe.size() > 0) {
-					empezar.setEnabled(true);
-				}
-			}
-		});
-		
-		if(hashGe.size() > 0) {
-			empezar.setEnabled(true);
-		}
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					InicioFrameT frame = new InicioFrameT();
-					frame.setVisible(true);
+		if(args.length > 0) {
+			iniApli.setVersion(VERSION);
+			Ejecucion eje;
+			try {
+				eje = new Ejecucion(Integer.parseInt(args[0]),Integer.parseInt(args[1]),iniApli,s,Boolean.parseBoolean(args[3]));
+				eje.inicio();
+			} catch (NumberFormatException| SQLException e) {
+				e.printStackTrace();
+			} 
+			
+		}else {
+			final Task_Grid task_G = new Task_Grid();
+			hashCa = task_G.getCategoriesToday();
+			setComboBox(hashCa);
+			
+			comboBox.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					comboBox_1.removeAll();
+					comboBox_1.removeAllItems();
+					task_G.setCategories_id(Integer.parseInt(hashCa.get(comboBox.getSelectedItem().toString()).toString()));
+					hashGe = task_G.getCategoriesAndGeneresToday();
+					for(String st : hashGe.keySet()) comboBox_1.addItem(st);
 					
-				} catch (Exception e) {
-					e.printStackTrace();
+					if(hashGe.size() > 0) {
+						empezar.setEnabled(true);
+					}
 				}
+			});
+			
+			if(hashGe.size() > 0) {
+				empezar.setEnabled(true);
 			}
-		});
-		
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					try {
+						InicioFrameT frame = new InicioFrameT();
+						frame.setVisible(true);
+						
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			
+			
+		}
 		
 	}
 
@@ -131,45 +136,19 @@ public class InicioFrameT extends JFrame {
 		setBounds(100, 100, 559, 383);
 		menuBar.setFont(new Font("Arial", Font.PLAIN, 12));
 		menuBar.setBackground(new Color(51, 153, 204));
-		
+		File file = new File(getClass().getResource("/com/selenium/twitter").getFile());
+	
+		System.out.println(file.getAbsolutePath());
+
 		setJMenuBar(menuBar);
 		mnUsuarios.setFont(new Font("Arial", Font.BOLD, 12));
 		
 		menuBar.add(mnUsuarios);
-		registrarUsuario.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				RegistrarUsuario registerUser;
-				try {
-					registerUser = new RegistrarUsuario();
-					registerUser.inicio();
-					
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-				
-			}
-		});
-		
-//		scrapping();
-		
-		mnUsuarios.add(registrarUsuario);
 		
 		buscarUsuario.setEnabled(false);
 		
 		mnUsuarios.add(buscarUsuario);
-		actualizarUsuario.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					UpdateUsers up = new UpdateUsers();
-					up.init();
-				}catch (Exception e1) {
-					System.err.println(e1);
-				}
-			}
-		});
 		
-		
-		mnUsuarios.add(actualizarUsuario);
 
 		mnVpn.setFont(new Font("Arial", Font.BOLD, 12));
 		
@@ -190,79 +169,6 @@ public class InicioFrameT extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		
-		mnCategorias.add(registrarCategoria);
-		mnCategorias.add(mntmRegistrarSubCategorie);
-		menuBar.add(mnCategorias);
-		
-		registrarCategoria.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				RegistrarCategories registrar = new RegistrarCategories();
-				registrar.inicio();
-			}
-		});
-		
-		mntmRegistrarSubCategorie.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent arg0) {
-				RegistrarSubCategorie regis;
-				try {
-					regis = new RegistrarSubCategorie();
-					regis.init();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-				
-				
-			}
-		});
-		
-		
-		mnFrases.add(registrarFrase);
-		mnFrases.add(registrarHashTag);
-		menuBar.add(mnFrases);
-		
-		registrarFrase.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				RegistrarFrase registrar;
-				
-					registrar = new RegistrarFrase();
-					registrar.inicio();
-				
-				
-			}
-		});
-		
-		registrarHashTag.addActionListener(new ActionListener() {
-			
-			public void actionPerformed(ActionEvent e) {
-				RegistrarHashTag registrar;
-				try {
-					registrar = new RegistrarHashTag();
-					registrar.inicio();
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-				
-			}
-		});
-		
-		
-		mnGenero.add(registrarGenero);
-		menuBar.add(mnGenero);
-		
-		registrarGenero.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent arg0) {
-				RegistrarGenero registrar = new RegistrarGenero();
-				registrar.inicio();
-			}
-			
-		});
-		
 		mnTask.add(registrarTarea);
 		menuBar.add(mnTask);
 		
@@ -273,15 +179,6 @@ public class InicioFrameT extends JFrame {
 			}
 		});
 		
-		mnPhotos.add(registrarDireccionDeFotos);
-		menuBar.add(mnPhotos);
-		
-		registrarDireccionDeFotos.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				RegistrarDireccionFotos dirFotos = new RegistrarDireccionFotos();
-				dirFotos.inicio();
-			}
-		});
 		
 		JLabel lblNewLabel = new JLabel(VERSION);
 		lblNewLabel.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -336,7 +233,7 @@ public class InicioFrameT extends JFrame {
 				try {
 					int id = Integer.parseInt(hashCa.get(comboBox.getSelectedItem().toString()).toString());
 					int id_genere = Integer.parseInt(hashGe.get(comboBox_1.getSelectedItem().toString()).toString());
-					Ejecucion eje = new Ejecucion(id,id_genere,iniApli,s);
+					Ejecucion eje = new Ejecucion(id,id_genere,iniApli,s,false);
 					setExtendedState(ICONIFIED);
 					eje.inicio();
 				} catch (SQLException e1) {
@@ -348,8 +245,8 @@ public class InicioFrameT extends JFrame {
 		});
 	}
 	
-	private static JComboBox<String> setComboBox(HashMap<String, Integer> map) {
-		comboBox = new JComboBox<String>();
+	private static JComboBox<String> setComboBox(Map<String, Integer> map) {
+		comboBox = new JComboBox<>();
 		
 		for (String string : map.keySet()) {
 			comboBox.addItem(string);

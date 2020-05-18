@@ -44,16 +44,17 @@ public class Ejecucion extends JFrame {
 	private JPanel contentPane;
 	private int categoria_id = 0;
 	private int generes_id = 0;
-	private List<String> list = new ArrayList<String>();
-	private List<String[]> listPost = new ArrayList<String[]>(); 
+	private List<String> list = new ArrayList<>();
+	private List<String[]> listPost = new ArrayList<>(); 
 	private User user = new User();
 	private JPanel panelUsuario = new JPanel();
-	private List<JLabel> listCheckBoxUsers = new ArrayList<JLabel>();
-	private List<String> listUsers = new ArrayList<String>();
+	private List<JLabel> listCheckBoxUsers = new ArrayList<>();
+	private List<String> listUsers = new ArrayList<>();
 	private int totalUser = 0;
 	private Categories categories = new Categories();
 	private Inicio_Aplicacion ini;
 	private Screen screen;
+	private boolean isManual;
 	
 	/**
 	 * Launch the application.
@@ -62,7 +63,7 @@ public class Ejecucion extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Ejecucion frame = new Ejecucion(categoria_id,generes_id,ini,screen);
+					Ejecucion frame = new Ejecucion(categoria_id,generes_id,ini,screen,isManual);
 					frame.setTitle(categories.getNameCategories(categoria_id));
 					frame.setVisible(true);
 					
@@ -81,12 +82,13 @@ public class Ejecucion extends JFrame {
 	 * @param id_genere 
 	 * @throws SQLException 
 	 */
-	public Ejecucion(int id, int id_genere, final Inicio_Aplicacion iniApli, Screen s) throws SQLException {
+	public Ejecucion(int id, int id_genere, final Inicio_Aplicacion iniApli, Screen s,boolean isManual) throws SQLException {
 		setTitle("Validacion");
 		this.categoria_id = id;
 		this.screen = s;
 		this.generes_id = id_genere;
 		this.ini = iniApli;
+		this.isManual =isManual;
 		setResizable(false);
 		setBounds(100, 100, 665, 733);
 		contentPane = new JPanel();
@@ -101,41 +103,73 @@ public class Ejecucion extends JFrame {
 		//Se crear el boton de empezar y se agrega su ActionListener
 		JButton btnEmpezar = new JButton("Empezar");
 		
-		//Se empieza el proceso de post
-				btnEmpezar.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0) {
-						
-						for (JLabel checkbox : listCheckBoxUsers) {
-							StringBuilder text = new StringBuilder("");
-							for (int i = 0; i < checkbox.getText().length(); i++) {
-								if(!checkbox.getText().substring(i,i+1).equals("(")) {
-									text.append(checkbox.getText().substring(i,i+1));
-									
-								}
-								if(checkbox.getText().substring(i,i+1).equals("(")) {
-									break;
-								}
+		if(isManual) {
+			//Se empieza el proceso de post
+			btnEmpezar.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					
+					for (JLabel checkbox : listCheckBoxUsers) {
+						StringBuilder text = new StringBuilder("");
+						for (int i = 0; i < checkbox.getText().length(); i++) {
+							if(!checkbox.getText().substring(i,i+1).equals("(")) {
+								text.append(checkbox.getText().substring(i,i+1));
+								
 							}
-							listUsers.add(text.toString().trim());
+							if(checkbox.getText().substring(i,i+1).equals("(")) {
+								break;
+							}
 						}
+						listUsers.add(text.toString().trim());
+					}
 
-						if(listCheckBoxUsers.isEmpty()) {
-							JOptionPane.showMessageDialog(null, "NO HAY USUARIOS PARA ESTA CAMPAÑA PARA PUBLICAR");
-						}else {
-							iniApli.setGeneres_id(generes_id);
-							iniApli.insert();
-							InicioController init = new InicioController(categoria_id,listUsers,screen);
-							setExtendedState(ICONIFIED);
-							try {
-								init.init();
-							} catch (SQLException | InterruptedException | IOException  e) {
-								e.printStackTrace();
-								Thread.currentThread().interrupt();
-							}
-						}					
+					if(listCheckBoxUsers.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "NO HAY USUARIOS PARA ESTA CAMPAÑA PARA PUBLICAR");
+					}else {
+						iniApli.setGeneres_id(generes_id);
+						iniApli.insert();
+						InicioController init = new InicioController(categoria_id,listUsers,screen);
+						setExtendedState(ICONIFIED);
+						try {
+							init.init();
+						} catch (SQLException | InterruptedException | IOException  e) {
+							e.printStackTrace();
+							Thread.currentThread().interrupt();
+						}
+					}					
+					
+				}
+			});
+		}else {
+			for (JLabel checkbox : listCheckBoxUsers) {
+				StringBuilder text = new StringBuilder("");
+				for (int i = 0; i < checkbox.getText().length(); i++) {
+					if(!checkbox.getText().substring(i,i+1).equals("(")) {
+						text.append(checkbox.getText().substring(i,i+1));
 						
 					}
-				});
+					if(checkbox.getText().substring(i,i+1).equals("(")) {
+						break;
+					}
+				}
+				listUsers.add(text.toString().trim());
+			}
+
+			if(listCheckBoxUsers.isEmpty()) {
+				JOptionPane.showMessageDialog(null, "NO HAY USUARIOS PARA ESTA CAMPAÑA PARA PUBLICAR");
+			}else {
+				iniApli.setGeneres_id(generes_id);
+				iniApli.insert();
+				InicioController init = new InicioController(categoria_id,listUsers,screen);
+				setExtendedState(ICONIFIED);
+				try {
+					init.init();
+				} catch (SQLException | InterruptedException | IOException  e) {
+					e.printStackTrace();
+					Thread.currentThread().interrupt();
+				}
+			}
+		}
+		
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setEnabled(false);

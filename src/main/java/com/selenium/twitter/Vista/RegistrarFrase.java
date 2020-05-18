@@ -24,6 +24,13 @@ import java.awt.event.ActionEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.event.PopupMenuEvent;
 
+
+/**
+ * Movido al app web
+ * 
+ * @author Luis Morales
+ * @deprecated
+ */
 public class RegistrarFrase extends JFrame {
 
 	/**

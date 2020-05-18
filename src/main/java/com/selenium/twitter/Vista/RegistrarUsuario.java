@@ -30,6 +30,13 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 
+
+/**
+ * Movido al aplicativo web
+ * 
+ * @author Luis Morales
+ * @deprecated 
+ */
 public class RegistrarUsuario extends JFrame {
 
 	/**
@@ -289,42 +296,39 @@ public class RegistrarUsuario extends JFrame {
 				int id =Integer.parseInt(hashVpn.get(comboBoxvPN.getSelectedItem().toString()).toString());
 
 				BigInteger telefono = new BigInteger(telefonoField.getText().trim());
-				if(id == 0) {
-					JOptionPane.showMessageDialog(null,"Debe seleccionar una VPN");
-				}else {
-					User usuario = new User();
-					usuario.setFull_name(NameField.getText().trim());
-					usuario.setUsername(usernameField.getText().trim());
-					usuario.setEmail(emailField.getText().trim());
-					usuario.setPassword(passwordField.getText().trim());
-					usuario.setPhone(telefono);
-					usuario.setCreator(creadorField.getText().trim());
-					usuario.setDate_of_birth(fdnField.getText().trim());
-					usuario.setSim_card_number(Integer.parseInt(simCardField.getText().trim()));
-					usuario.setVpn_id(id);
-					usuario.setCategories_id(Integer.parseInt(hashCate.get(comboBoxCategori.getSelectedItem().toString()).toString()));
-					contentPane.setEnabled(false);
-					try {
-						usuario.insert();
-						JOptionPane.showMessageDialog(null,"Usuario agregado con exito");
-						NameField.setText("");
-						NameField.setFocusable(true);
-						telefonoField.setText("");
-						usernameField.setText("");
-						emailField.setText("");
-						passwordField.setText("");
-						creadorField.setText("");
-						fdnField.setText("");
-						simCardField.setText("");
-						comboBoxvPN.setSelectedIndex(0);
-						comboBoxCategori.setSelectedIndex(0);
-					}catch(MysqlDataTruncation e3) {
-						JOptionPane.showMessageDialog(null, "Hay error en uno de los datos ingresados, por favor validar","Failed",JOptionPane.ERROR_MESSAGE);
-					}catch(MySQLIntegrityConstraintViolationException e2) {
-						JOptionPane.showMessageDialog(null, "Usuario o correo repetido, por favor validar","Failed",JOptionPane.ERROR_MESSAGE);
-					}catch (SQLException e1) {
-						JOptionPane.showMessageDialog(null, "Error al ingresar usuario, por favor validar los campos","Failed",JOptionPane.ERROR_MESSAGE);
-					}
+
+				User usuario = new User();
+				usuario.setFull_name(NameField.getText().trim());
+				usuario.setUsername(usernameField.getText().trim());
+				usuario.setEmail(emailField.getText().trim());
+				usuario.setPassword(passwordField.getText().trim());
+				usuario.setPhone(telefono);
+				usuario.setCreator(creadorField.getText().trim());
+				usuario.setDate_of_birth(fdnField.getText().trim());
+				usuario.setSim_card_number(Integer.parseInt(simCardField.getText().trim()));
+				usuario.setVpn_id(id);
+				usuario.setCategories_id(Integer.parseInt(hashCate.get(comboBoxCategori.getSelectedItem().toString()).toString()));
+				contentPane.setEnabled(false);
+				try {
+					usuario.insert();
+					JOptionPane.showMessageDialog(null,"Usuario agregado con exito");
+					NameField.setText("");
+					NameField.setFocusable(true);
+					telefonoField.setText("");
+					usernameField.setText("");
+					emailField.setText("");
+					passwordField.setText("");
+					creadorField.setText("");
+					fdnField.setText("");
+					simCardField.setText("");
+					comboBoxvPN.setSelectedIndex(0);
+					comboBoxCategori.setSelectedIndex(0);
+				}catch(MysqlDataTruncation e3) {
+					JOptionPane.showMessageDialog(null, "Hay error en uno de los datos ingresados, por favor validar","Failed",JOptionPane.ERROR_MESSAGE);
+				}catch(MySQLIntegrityConstraintViolationException e2) {
+					JOptionPane.showMessageDialog(null, "Usuario o correo repetido, por favor validar","Failed",JOptionPane.ERROR_MESSAGE);
+				}catch (SQLException e1) {
+					JOptionPane.showMessageDialog(null, "Error al ingresar usuario, por favor validar los campos","Failed",JOptionPane.ERROR_MESSAGE);
 				}
 				
 			}
