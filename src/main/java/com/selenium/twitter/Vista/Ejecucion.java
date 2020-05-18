@@ -63,6 +63,7 @@ public class Ejecucion extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
+					
 					Ejecucion frame = new Ejecucion(categoria_id,generes_id,ini,screen,isManual);
 					frame.setTitle(categories.getNameCategories(categoria_id));
 					frame.setVisible(true);
@@ -102,74 +103,6 @@ public class Ejecucion extends JFrame {
 		
 		//Se crear el boton de empezar y se agrega su ActionListener
 		JButton btnEmpezar = new JButton("Empezar");
-		
-		if(isManual) {
-			//Se empieza el proceso de post
-			btnEmpezar.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent arg0) {
-					
-					for (JLabel checkbox : listCheckBoxUsers) {
-						StringBuilder text = new StringBuilder("");
-						for (int i = 0; i < checkbox.getText().length(); i++) {
-							if(!checkbox.getText().substring(i,i+1).equals("(")) {
-								text.append(checkbox.getText().substring(i,i+1));
-								
-							}
-							if(checkbox.getText().substring(i,i+1).equals("(")) {
-								break;
-							}
-						}
-						listUsers.add(text.toString().trim());
-					}
-
-					if(listCheckBoxUsers.isEmpty()) {
-						JOptionPane.showMessageDialog(null, "NO HAY USUARIOS PARA ESTA CAMPAÑA PARA PUBLICAR");
-					}else {
-						iniApli.setGeneres_id(generes_id);
-						iniApli.insert();
-						InicioController init = new InicioController(categoria_id,listUsers,screen);
-						setExtendedState(ICONIFIED);
-						try {
-							init.init();
-						} catch (SQLException | InterruptedException | IOException  e) {
-							e.printStackTrace();
-							Thread.currentThread().interrupt();
-						}
-					}					
-					
-				}
-			});
-		}else {
-			for (JLabel checkbox : listCheckBoxUsers) {
-				StringBuilder text = new StringBuilder("");
-				for (int i = 0; i < checkbox.getText().length(); i++) {
-					if(!checkbox.getText().substring(i,i+1).equals("(")) {
-						text.append(checkbox.getText().substring(i,i+1));
-						
-					}
-					if(checkbox.getText().substring(i,i+1).equals("(")) {
-						break;
-					}
-				}
-				listUsers.add(text.toString().trim());
-			}
-
-			if(listCheckBoxUsers.isEmpty()) {
-				JOptionPane.showMessageDialog(null, "NO HAY USUARIOS PARA ESTA CAMPAÑA PARA PUBLICAR");
-			}else {
-				iniApli.setGeneres_id(generes_id);
-				iniApli.insert();
-				InicioController init = new InicioController(categoria_id,listUsers,screen);
-				setExtendedState(ICONIFIED);
-				try {
-					init.init();
-				} catch (SQLException | InterruptedException | IOException  e) {
-					e.printStackTrace();
-					Thread.currentThread().interrupt();
-				}
-			}
-		}
-		
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setEnabled(false);
@@ -242,6 +175,73 @@ public class Ejecucion extends JFrame {
 		}
 		
 		lblTotal.setText(lblTotal.getText()+": "+totalUser);
+		
+		if(isManual) {
+			//Se empieza el proceso de post
+			btnEmpezar.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					
+					for (JLabel checkbox : listCheckBoxUsers) {
+						StringBuilder text = new StringBuilder("");
+						for (int i = 0; i < checkbox.getText().length(); i++) {
+							if(!checkbox.getText().substring(i,i+1).equals("(")) {
+								text.append(checkbox.getText().substring(i,i+1));
+								
+							}
+							if(checkbox.getText().substring(i,i+1).equals("(")) {
+								break;
+							}
+						}
+						listUsers.add(text.toString().trim());
+					}
+
+					if(listCheckBoxUsers.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "NO HAY USUARIOS PARA ESTA CAMPAÑA PARA PUBLICAR");
+					}else {
+						iniApli.setGeneres_id(generes_id);
+						iniApli.insert();
+						InicioController init = new InicioController(categoria_id,listUsers,screen);
+						setExtendedState(ICONIFIED);
+						try {
+							init.init();
+						} catch (SQLException | InterruptedException | IOException  e) {
+							e.printStackTrace();
+							Thread.currentThread().interrupt();
+						}
+					}					
+					
+				}
+			});
+		}else {
+			for (JLabel checkbox : listCheckBoxUsers) {
+				StringBuilder text = new StringBuilder("");
+				for (int i = 0; i < checkbox.getText().length(); i++) {
+					if(!checkbox.getText().substring(i,i+1).equals("(")) {
+						text.append(checkbox.getText().substring(i,i+1));
+						
+					}
+					if(checkbox.getText().substring(i,i+1).equals("(")) {
+						break;
+					}
+				}
+				listUsers.add(text.toString().trim());
+			}
+
+			if(listCheckBoxUsers.isEmpty()) {
+				JOptionPane.showMessageDialog(null, "NO HAY USUARIOS PARA ESTA CAMPAÑA PARA PUBLICAR");
+			}else {
+				iniApli.setGeneres_id(generes_id);
+				iniApli.insert();
+				InicioController init = new InicioController(categoria_id,listUsers,screen);
+				setExtendedState(ICONIFIED);
+				try {
+					init.init();
+				} catch (SQLException | InterruptedException | IOException  e) {
+					e.printStackTrace();
+					Thread.currentThread().interrupt();
+				}
+			}
+		}
 
 		contentPane.setLayout(gl_contentPane);
 	}

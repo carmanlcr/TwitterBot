@@ -2,7 +2,6 @@ package com.selenium.twitter.Vista;
 
 
 
-import com.selenium.facebook.Vista.Ejecucion;
 import com.selenium.twitter.Modelo.*;
 
 import configurations.controller.SikuliTest;

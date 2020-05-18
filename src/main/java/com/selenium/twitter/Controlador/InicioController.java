@@ -16,9 +16,12 @@ import configurations.controller.*;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.sikuli.script.FindFailed;
 import org.sikuli.script.Screen;
+import configurations.controller.SftpController;
 
 import com.selenium.twitter.Modelo.Post;
+import com.selenium.twitter.Modelo.Task_Grid_Tags;
 import com.selenium.twitter.Modelo.*;
+
 
 /**
  * 
@@ -113,14 +116,22 @@ public class InicioController {
 							String ip = validateIP();
 							
 							String ipActual = "01.02.03.04";
+							Vpn v = new Vpn();
+							v.setVpn_id(users.getVpn_id());
+							v = v.getVpn();
 							if(users.getVpn_id() != 0) {
-								Vpn v = new Vpn();
-								v.setVpn_id(users.getVpn_id());
-								v = v.getVpn();
 								vpn = new VpnController(v.getName());
-								vpn.connectVpn();
+								vpn.connectVpnName();
 								ipActual = validateIP();
 							}
+							
+							if(ip.equals(ipActual)) {
+								String[] groupVpn = v.getName().split("#");
+								vpn = new VpnController(groupVpn[0].trim());
+								vpn.connectVpnGroup();
+								ipActual = validateIP();
+							}
+							
 							//Valida si la vpn conecto
 							if(ip.equals(ipActual)) {
 								System.err.println("El usuario "+users.getUsername()+ " no se puedo conectar a la vpn");
@@ -200,19 +211,25 @@ public class InicioController {
 		random(listTask);
 		
 		// Darle al panel de opciones
-		if(drive.searchElement(1, "//*[@data-testid='AppTabBar_More_Menu']") != 0) {
-			drive.clickButton(1, "//*[@data-testid='AppTabBar_More_Menu']", "");
-		}else if (drive.searchElement(1, "/html/body/div/div/div/div/header/div/div/div/div/div[2]/nav/div") != 0) {
-			drive.clickButton(1, "/html/body/div/div/div/div/header/div/div/div/div/div[2]/nav/div","Menu");
-		} 
-
-		Thread.sleep(getNumberRandomForSecond(2002, 3501));
-		// Darle click a la barra de opciones
-		if(drive.searchElement(1, "//*[@data-testid='logout']") != 0) {
-			drive.clickButton(1, "//*[@data-testid='logout']", "Logout");
-		}else if(drive.searchElement(1, "/html/body/div/div/div/div[1]/div/div/div[2]/div[3]/div/div/div/div/div[13]/a") != 0) {
-			drive.clickButton(1, "/html/body/div/div/div/div[1]/div/div/div[2]/div[3]/div/div/div/div/div[13]/a", "Logout xpath");
+		System.out.println("Cerrar sesion");
+		drive.goPage(URL_TWITTER+"logout");
+		
+		if(drive.searchElement(1, "//*[@aria-label='confirmationSheetConfirm']") != 0) {
+			
+			drive.clickButton(1, "//*[@aria-label='confirmationSheetConfirm']", "Cerrar sesion");
+			
+			
+		}else if(screen.exists(PATH_IMAGES_SIKULI+"close_session-Twitter.png") != null) {
+			
+				try {
+					screen.click(PATH_IMAGES_SIKULI+"close_session-Twitter.png");
+				} catch (FindFailed | IllegalThreadStateException e) {
+					e.printStackTrace();
+				}
+			
 		}
+
+		Thread.sleep(2500);
 		
 
 		System.out.println("Se cerro la sesión del usuario " + users.getUsername());
@@ -250,7 +267,7 @@ public class InicioController {
 						if(isPublication) {
 							System.out.println("HACER PUBLICACION FINAL");
 							SftpController sftp = new SftpController();
-							sftp.downloadFileSftp(image);
+							sftp.downloadFileSftp(SftpController.PATH_IMAGE_UPLOAD,image,SftpController.PATH_IMAGE_DOWNLOAD_FTP);
 							uploadImageFinal();
 						}
 						break;
@@ -259,6 +276,9 @@ public class InicioController {
 						break;
 					case 7:
 						followUsers();
+						break;
+					case 8:
+						getFollowers();
 						break;
 					default:
 						break;
@@ -377,9 +397,17 @@ public class InicioController {
 				"Sigueme y te sigo #followback #follow","Tusa","Really?","Cantaclaro","Simon Diaz","No es copia, jamas.",
 				"Soy de las personas que prefieren netflix que estar en una rumba","¿Tu mamá sabe que usas el internet para dejarme en visto?",
 				"Amo la lluvia","Odio los climas calientes","Perreo catolico","El celular nunca puede ser mas importante que la persona con la que estas comiendo.",
-				"No!","O quizás si jejeje","Que cancion tan genial"};
+				"No!","O quizás si jejeje","Que cancion tan genial","Limpia de tu mente del no puedo y hazlo.",
+				"No pienses en alguien que no piensa en ti.","Toda tóxica tiene un lunar cerca de la boca o en los senos.",
+				"A la gente así siempre se le devuelven las cosas.","¿Por qué nos afecta tanto darnos cuenta de algo que en el fondo ya sabíamos?",
+				"Me encanta la gente positiva, agradecida, humilde y soñadora.",
+				"márchate y cúrate la herida, la distancia a veces es la única manera de encontrar la paz."};
 		
-		robot.inputWrite(array[getNumberRandomForSecond(0, array.length-1)]);
+		Thread.sleep(800);
+		robot.selectAllAndDelete();
+		
+		Thread.sleep(999);
+		robot.inputWrite(array[getNumberRandomForSecond(0, array.length)]);
 		
 		if(screen.exists(PATH_IMAGES_SIKULI+"twittear-Twitter.png") != null) {
 			try {
@@ -438,80 +466,92 @@ public class InicioController {
 	}
 	
 	private void followUsers() throws InterruptedException {
-		String[] hashtag = {"#followforfollow","#followback","#followme","#follow4follow","#FollowPyramid","#TEAMFOLLOWBACK",
-							"#SiguemeYTeSigo","#F4F"};
-		if(drive.searchElement(1, "//*[@data-testid='SearchBox_Search_Input']") != 0) {
-			drive.inputWrite(1, "//*[@data-testid='SearchBox_Search_Input']", hashtag[getNumberRandomForSecond(0, hashtag.length-1)], 114);
-			Thread.sleep(1450);
-			robot.enter();
-			
-			Thread.sleep(5050);
-			if(drive.searchElement(1, "//*[text()[contains(.,'Personas')]]") != 0 || drive.searchElement(1, "//*[text()[contains(.,'People')]]") != 0) {
-				if(drive.searchElement(1, "/html/body/div/div/div/div[2]/main/div/div/div/div/div/div[1]/div[2]/nav/div[2]/div[3]/a") != 0) {
-					drive.clickButton(1, "/html/body/div/div/div/div[2]/main/div/div/div/div/div/div[1]/div[2]/nav/div[2]/div[3]/a", "Personas xPath 1");
-				}else if(drive.searchElement(1, "//*[text()[contains(.,'Personas')]]") != 0) {
-					drive.clickButton(1, "//*[text()[contains(.,'Personas')]]", "Personas xPath");
-				}else if(drive.searchElement(1, "//*[text()[contains(.,'People')]]") != 0) {
-					drive.clickButton(1, "//*[text()[contains(.,'People')]]", "People xPath");
-				}
+		Task_Grid_Tags tgt = new Task_Grid_Tags();
+		tgt.setTasks_grid_id(tasks_grid_id);
+		List<Task_Grid_Tags> list = tgt.getTagsForTask();
+		
+		for(Task_Grid_Tags tags : list) {
+			String tag =  tags.getTags().trim();
+			if(drive.searchElement(1, "//*[@data-testid='SearchBox_Search_Input']") != 0) {
+				drive.inputWrite(1, "//*[@data-testid='SearchBox_Search_Input']",tag, 114);
+				Thread.sleep(1450);
+				robot.enter();
 				
-				Thread.sleep(1240);
-				//html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[1]/a/div/div[1]/div[1]/span/span
-				//html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[2]/div
-				//[2]/div/div/div/div[2]/div[1]/div[2]/div
-				int quantityUsers = drive.getQuantityElements(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div") -3;
-				
-				if(quantityUsers < 1) {
-					System.out.println("No hay usuarios para seguir");
-				}else {
-					for(int i = 1; i<=quantityUsers; i++) {
-						if(drive.searchElement(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[2]/div") != 0) {
-							try {
-								drive.clickButton(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[2]/div", "Follow user "+i);
+				Thread.sleep(5050);
+				if(drive.searchElement(1, "//*[text()[contains(.,'Personas')]]") != 0 || drive.searchElement(1, "//*[text()[contains(.,'People')]]") != 0) {
+					if(drive.searchElement(1, "/html/body/div/div/div/div[2]/main/div/div/div/div/div/div[1]/div[2]/nav/div[2]/div[3]/a") != 0) {
+						drive.clickButton(1, "/html/body/div/div/div/div[2]/main/div/div/div/div/div/div[1]/div[2]/nav/div[2]/div[3]/a", "Personas xPath 1");
+					}else if(drive.searchElement(1, "//*[text()[contains(.,'Personas')]]") != 0) {
+						drive.clickButton(1, "//*[text()[contains(.,'Personas')]]", "Personas xPath");
+					}else if(drive.searchElement(1, "//*[text()[contains(.,'People')]]") != 0) {
+						drive.clickButton(1, "//*[text()[contains(.,'People')]]", "People xPath");
+					}
+					
+					Thread.sleep(1240);
+					int quantityUsers = drive.getQuantityElements(1, "/html/body/div/div/div/div[2]/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div") -1;
+					
+					if(quantityUsers < 1) {
+						System.out.println("No hay usuarios para seguir");
+					}else {
+						for(int i = 1; i<=quantityUsers; i++) {
+							if(drive.getText(1, "/html/body/div/div/div/div[2]/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[1]/a/div/div[2]/div/span").contains(tag)) {
+								                
+								String url = drive.getHref(1, "/html/body/div/div/div/div[2]/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[1]/a");
 								
-								System.out.println("El usuario a seguir es: "+drive.getText(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[1]/a/div/div[1]/div[1]/span/span"));
+								drive.goPage(url+"/followers");
 								
-								robot.mouseScroll(1);
-							}catch(ElementClickInterceptedException e) {	
+								reviewUser();
+								
+								break;
 							}
-
+							Thread.sleep(695);
 						}
-						Thread.sleep(695);
 					}
 				}
-			}else {
-				robot.pressTab();
-				Thread.sleep(100);
-				robot.pressTab();
-				Thread.sleep(100);
-				robot.pressTab();
-				Thread.sleep(100);
-				robot.pressTab();
-				Thread.sleep(100);
-				robot.pressTab();
-				Thread.sleep(100);
-				robot.pressTab();
-				Thread.sleep(5000);
-				
-				int quantityUsers = drive.getQuantityElements(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div") -3;
-				
-				if(quantityUsers < 1) {
-					System.out.println("No hay usuarios para seguir");
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @throws InterruptedException
+	 */
+	private void reviewUser() throws InterruptedException {
+		robot.mouseScroll(250);
+		Thread.sleep(1000);
+		robot.mouseScroll(-250);
+		int quantityUsersFollowers = drive.getQuantityElements(1, "/html/body/div/div/div/div[2]/main/div/div/div/div[1]/div/div[2]/section/div/div/div");
+		int quantityFollows = 0;
+		if(quantityUsersFollowers < 1) {
+			System.out.println("No hay usuarios para seguir");
+		}else {
+			for(int i = 1; i<=quantityUsersFollowers; i++ ) {
+				if(quantityFollows != 14) {
+					int numRamdon = getNumberRandomForSecond(1, 3);
+					if(numRamdon == 2) {
+						
+						quantityFollows += followUser(i);
+					}
 				}else {
-					for(int i = 1; i<=quantityUsers; i++) {
-						if(drive.searchElement(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[2]/div") != 0) {
-							drive.clickButton(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[2]/div", "Follow user "+i);
-							
-							System.out.println("El usuario a seguir es: "+drive.getText(1, "/html/body/div/div/div/div/main/div/div/div/div[1]/div/div[2]/div/div/section/div/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[1]/a/div/div[1]/div[1]/span/span"));
-						}
-						Thread.sleep(895);
-					}
+					break;
 				}
+				
 				
 			}
 		}
 	}
 	
+	private int followUser(int i) {
+		if(drive.getText(1, "/html/body/div/div/div/div[2]/main/div/div/div/div[1]/div/div[2]/section/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[2]/div/div/span/span").contains("Seguir")
+				|| drive.getText(1, "/html/body/div/div/div/div[2]/main/div/div/div/div[1]/div/div[2]/section/div/div/div["+i+"]/div/div/div/div[2]/div[1]/div[2]/div/div/span/span").contains("Follow")) {
+			
+			drive.clickButton(1, "/html/body/div/div/div/div[2]/main/div/div/div/div[1]/div/div[2]/section/div/div/div["+i+"]/div/div/div/div[2]/div/div[2]/div", "Seguir xpath "+i);
+			
+			return 1;
+		}
+		
+		return 0;
+	}
 	/**
 	 * Publicar imagen normal 
 	 * 
@@ -546,6 +586,12 @@ public class InicioController {
 			System.out.println("sub_categories_id: "+subC.getSub_categories_id()+" categoria_id: "+subC.getCategories_id());
 			ph =ph.getPhraseRandomSubCategorie();
 			System.out.println("Escribir pie de foto");
+			
+			Thread.sleep(800);
+			robot.selectAllAndDelete();
+			
+			Thread.sleep(999);
+			
 			robot.inputWrite(ph.getPhrase());
 			Thread.sleep(getNumberRandomForSecond(1546, 1687));
 			
@@ -554,7 +600,12 @@ public class InicioController {
 			pathPhoto.setCategories_id(subC.getCategories_id());
 			pathPhoto = pathPhoto.getPathPhotoSubCategories();
 			System.out.println("Agregar foto ");
-			drive.inputWriteFile(1, "/html/body/div/div/div/div[1]/div/div/div/div/div[2]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div[2]/div[2]/div/div/div[1]/input", pathPhoto.getPath());
+			
+			if(drive.searchElement(1, "/html/body/div/div/div/div[1]/div[2]/div/div/div/div[2]/div[2]/div/div[3]/div/div/div/div[1]/div/div/div/div/div[2]/div[2]/div/div/div[1]/input") != 0) {
+				drive.inputWriteFile(1, "/html/body/div/div/div/div[1]/div[2]/div/div/div/div[2]/div[2]/div/div[3]/div/div/div/div[1]/div/div/div/div/div[2]/div[2]/div/div/div[1]/input", pathPhoto.getPath());
+			}else if(drive.searchElement(1, "/html/body/div/div/div/div[1]/div/div/div/div/div[2]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div[2]/div[2]/div/div/div[1]/input") != 0) {
+				drive.inputWriteFile(1, "/html/body/div/div/div/div[1]/div/div/div/div/div[2]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div[2]/div[2]/div/div/div[1]/input", pathPhoto.getPath());
+			}
 			Thread.sleep(getNumberRandomForSecond(3546, 4677));
 			
 			if(screen.exists(PATH_IMAGES_SIKULI+"twittear-Twitter.png") != null) {
@@ -640,25 +691,6 @@ public class InicioController {
 		robot.mouseScroll(-8);
 		Thread.sleep(getNumberRandomForSecond(1145 ,1457));
 		
-		System.out.println("Contar cantidad de notificaciones");
-		int quantityMessage = drive.getQuantityElements(1, "/html/body/div/div/div/div/main/div/div/div/div[2]/div[2]/section/div/div/div/div");
-		
-		if(quantityMessage == 0) {
-			System.out.println("No hay mensajes para ver");
-		}else {
-			int randomMessage = getNumberRandomForSecond(1, quantityMessage);
-			System.out.println("Numero de mensaje a ingresar "+randomMessage);
-			try {
-				drive.clickButton(1, "/html/body/div/div/div/div/main/div/div/div/div[2]/div[2]/section/div/div/div/div["+randomMessage+"]/div/div", "Mensaje xpath random");
-				Thread.sleep(getNumberRandomForSecond(2145 ,2458));
-				robot.mouseScroll(-8);
-				Thread.sleep(getNumberRandomForSecond(1145 ,1458));
-				robot.mouseScroll(8);
-				Thread.sleep(getNumberRandomForSecond(1145 ,1457));
-			}catch (Exception e) {
-				e.getStackTrace();
-			}
-		}
 	}
 	
 	private void reviewNotifaction() throws InterruptedException {
@@ -693,81 +725,133 @@ public class InicioController {
 		}
 		
 		Thread.sleep(getNumberRandomForSecond(1234, 1548));
-
-			robot.inputWrite(phrase);
-			
-
+		
+		Thread.sleep(800);
+		robot.selectAllAndDelete();
+		
+		Thread.sleep(999);
+		robot.inputWrite(phrase);
+		
+		Thread.sleep(999);
+		
+		System.out.println("Subir imagen");
+		
+		if(drive.searchElement(1, "/html/body/div/div/div/div[1]/div[2]/div/div/div/div[2]/div[2]/div/div[3]/div/div/div/div[1]/div/div/div/div/div[2]/div[2]/div/div/div[1]/input") != 0) {
+			drive.inputWriteFile(1, "/html/body/div/div/div/div[1]/div[2]/div/div/div/div[2]/div[2]/div/div[3]/div/div/div/div[1]/div/div/div/div/div[2]/div[2]/div/div/div[1]/input", PATH_IMAGES_SFTP+image);
+		}else if(drive.searchElement(1, "/html/body/div/div/div/div[1]/div/div/div/div/div[2]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div[2]/div[2]/div/div/div[1]/input") != 0) {
 			drive.inputWriteFile(1, "/html/body/div/div/div/div[1]/div/div/div/div/div[2]/div[2]/div/div[3]/div/div/div[1]/div/div/div/div[2]/div[2]/div/div/div[1]/input", PATH_IMAGES_SFTP+image);
-			Thread.sleep(getNumberRandomForSecond(4546, 5677));
+		}
+								
+		Thread.sleep(getNumberRandomForSecond(4546, 5677));
 			
-			if(screen.exists(PATH_IMAGES_SIKULI+"twittear-Twitter.png") != null) {
-				try {
+		if(screen.exists(PATH_IMAGES_SIKULI+"twittear-Twitter.png") != null) {
+			try {
 	
-					screen.click(PATH_IMAGES_SIKULI+"twittear-Twitter.png");
-				} catch (FindFailed | IllegalThreadStateException e) {
-					System.out.println("No se encontro la imagen");
+				screen.click(PATH_IMAGES_SIKULI+"twittear-Twitter.png");
+			} catch (FindFailed | IllegalThreadStateException e) {
+				System.out.println("No se encontro la imagen");
+			}
+		}else {
+			try {
+				if(drive.searchElement(1, "//*[@data-testid='tweetButton']") != 0) {
+					drive.clickButton(1, "//*[@data-testid='tweetButton']", "TweetButton publicar");
 				}
-			}else {
+			}catch(ElementClickInterceptedException | org.openqa.selenium.NoSuchElementException e) {
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.pressTab();
+				Thread.sleep(156);
+				robot.enter();
+			}
+		}
+			
+		
+		if(drive.searchElement(1, "//*[text()[contains(.,'Your account is suspended and is not permitted to send Tweets.')]]") != 0) {
+			userBlock = true;
+			
+			robot.pressEsc();
+			Thread.sleep(125);
+			robot.pressEsc();
+			Thread.sleep(125);
+			robot.pressEsc();
+			
+			if(screen.exists(PATH_IMAGES_SIKULI+"descartar_tweet-Twitter.png") != null) {
 				try {
-					if(drive.searchElement(1, "//*[@data-testid='tweetButton']") != 0) {
-						drive.clickButton(1, "//*[@data-testid='tweetButton']", "TweetButton publicar");
-					}
-				}catch(ElementClickInterceptedException | org.openqa.selenium.NoSuchElementException e) {
-					robot.pressTab();
-					Thread.sleep(156);
-					robot.pressTab();
-					Thread.sleep(156);
-					robot.pressTab();
-					Thread.sleep(156);
-					robot.enter();
+					screen.click(PATH_IMAGES_SIKULI+"descartar_tweet-Twitter.png");
+				} catch (FindFailed | IllegalThreadStateException e) {
+					System.out.println("Error al conseguir imagen en pantalla");
 				}
 			}
+		}else {
+			robot.pressEsc();
+			Thread.sleep(125);
+			robot.pressEsc();
+			Thread.sleep(125);
+			robot.pressEsc();
 			
-			
-			if(drive.searchElement(1, "//*[text()[contains(.,'Your account is suspended and is not permitted to send Tweets.')]]") != 0) {
-				userBlock = true;
-				
-				robot.pressEsc();
-				Thread.sleep(125);
-				robot.pressEsc();
-				Thread.sleep(125);
-				robot.pressEsc();
-				
-				if(screen.exists(PATH_IMAGES_SIKULI+"descartar_tweet-Twitter.png") != null) {
-					try {
-						screen.click(PATH_IMAGES_SIKULI+"descartar_tweet-Twitter.png");
-					} catch (FindFailed | IllegalThreadStateException e) {
-						System.out.println("Error al conseguir imagen en pantalla");
-					}
+			if(screen.exists(PATH_IMAGES_SIKULI+"descartar_tweet-Twitter.png") != null) {
+				try {
+					screen.click(PATH_IMAGES_SIKULI+"descartar_tweet-Twitter.png");
+				} catch (FindFailed | IllegalThreadStateException e) {
+					System.out.println("Error al conseguir imagen en pantalla");
 				}
 			}else {
-				robot.pressEsc();
-				Thread.sleep(125);
-				robot.pressEsc();
-				Thread.sleep(125);
-				robot.pressEsc();
-				
-				if(screen.exists(PATH_IMAGES_SIKULI+"descartar_tweet-Twitter.png") != null) {
-					try {
-						screen.click(PATH_IMAGES_SIKULI+"descartar_tweet-Twitter.png");
-					} catch (FindFailed | IllegalThreadStateException e) {
-						System.out.println("Error al conseguir imagen en pantalla");
-					}
-				}else {
-					po.setTasks_grid_id(tasks_grid_id);
-					po.setTasks_model_id(taskModelId);
-					po.insert();
-				}
+				po.setTasks_grid_id(tasks_grid_id);
+				po.setTasks_model_id(taskModelId);
+				po.insert();
 			}
+		}
 			
 			Thread.sleep(getNumberRandomForSecond(8546, 8677));
-			
-			
-
-		
 	}
-	
  
+	private void getFollowers() throws InterruptedException {
+		if(drive.searchElement(1, "/html/body/div/div/div/div[2]/header/div/div/div/div[1]/div[2]/nav/a[7]") != 0) {
+			drive.clickButton(1, "/html/body/div/div/div/div[2]/header/div/div/div/div[1]/div[2]/nav/a[7]", "Perfil");
+			
+			Thread.sleep(1250);
+			try {
+				int following = Integer.parseInt(drive.getTitle(1, "/html/body/div/div/div/div[2]/main/div/div/div/div[1]/div/div[2]/div/div/div[1]/div/div[5]/div[1]/a"));
+				int followers = Integer.parseInt(drive.getTitle(1,"/html/body/div/div/div/div[2]/main/div/div/div/div[1]/div/div[2]/div/div/div[1]/div/div[5]/div[2]/a"));
+				
+
+				Users_Follower userF = new Users_Follower();
+				userF.setUsers_id(idUser);
+				userF.setFollowers(followers);
+				userF.setFollowing(following);
+				
+				userF = userF.find(idUser);
+				
+				if(userF == null) {
+					userF = new Users_Follower();
+					userF.setUsers_id(idUser);
+					userF.setFollowers(followers);
+					userF.setFollowing(following);
+					try {
+						userF.insert();
+						System.out.println("Se insertaron los datos correctamente");
+					} catch (SQLException e) {
+						e.printStackTrace();
+					}
+				}else {
+					if(following != userF.getFollowing() || followers != userF.getFollowers()) {
+						userF.setFollowers(followers);
+						userF.setFollowing(following);
+						try {
+							userF.insert();
+							System.out.println("Se insertaron nuevos datos correctamente");
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}catch(NumberFormatException e) {
+				//NONE
+			}
+		}
+	}
 	
 	/**
 	 * 
